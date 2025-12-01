@@ -2,7 +2,7 @@ const std = @import("std");
 const N = 4664;
 
 pub fn main() !void {
-    const in_file = std.fs.cwd().openFile("input", .{ .mode = .read_only }) catch |err| return err;
+    const in_file = try std.fs.cwd().openFile("input", .{ .mode = .read_only });
     var in_buf: [100]u8 = undefined;
     var in_r = in_file.reader(&in_buf);
     var reader = &in_r.interface;
