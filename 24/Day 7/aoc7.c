@@ -4,11 +4,10 @@
 
 typedef uint64_t ull;
 #define N 850
+typedef unsigned char uc;
 
-// handles +, *
-int check(int *, int, int, uint64_t, ull);
-// check() with || operator
-int check2(int *, int, int, uint64_t, ull);
+// bitmasked, handles all operators
+uc check(int *, int, int, ull, ull);
 
 #include <stdio.h>
 
@@ -35,9 +34,10 @@ int main() {
     for (; j < n - 1; ++j)
       fscanf(f, "%d ", arr + j);
     fscanf(f, "%d\n", arr + j);
-    if (check(arr, n, 1, arr[0], t))
+    uc bits = check(arr, n, 1, arr[0], t);
+    if (bits & 1)
       p1 += t;
-    if (check2(arr, n, 1, arr[0], t))
+    if (bits & 2)
       p2 += t;
     free(arr);
   }
@@ -45,36 +45,31 @@ int main() {
   return 0;
 }
 
-int check(int *arr, int n, int idx, ull v, ull t) {
+uc check(int *arr, int n, int idx, ull v, ull t) {
   if (idx == n)
-    return v == t;
-  ull add = v + arr[idx];
-  if (add <= t && check(arr, n, idx + 1, add, t))
-    return 1;
-  if (v <= t / arr[idx]) {
-    ull mul = v * arr[idx];
-    if (mul <= t && check(arr, n, idx + 1, mul, t))
-      return 1;
-  }
-  return 0;
-}
+    return v == t ? 3 : 0;
 
-int check2(int *arr, int n, int idx, ull v, ull t) {
-  if (idx == n)
-    return v == t;
+  uc ret = 0;
+
   ull add = v + arr[idx];
-  if (add <= t && check2(arr, n, idx + 1, add, t))
-    return 1;
-  if (v <= t / arr[idx]) {
+  if (add <= t)
+    ret |= check(arr, n, idx + 1, add, t);
+
+  if (arr[idx] != 0 && v <= t / arr[idx]) {
     ull mul = v * arr[idx];
-    if (mul <= t && check2(arr, n, idx + 1, mul, t))
-      return 1;
+    if (mul <= t)
+      ret |= check(arr, n, idx + 1, mul, t);
   }
+
   int tmp = arr[idx], p = 1;
   while (tmp > 0) {
     p *= 10;
     tmp /= 10;
   }
   v = v * p + arr[idx];
-  return check2(arr, n, idx + 1, v, t);
+  if (v <= t)
+    if (check(arr, n, idx + 1, v, t))
+      ret |= 2;
+
+  return ret;
 }
