@@ -3,15 +3,15 @@ const N = 4664;
 
 pub fn main() !void {
     const in_file = try std.fs.cwd().openFile("input", .{ .mode = .read_only });
+    defer in_file.close();
     var in_buf: [100]u8 = undefined;
     var in_r = in_file.reader(&in_buf);
-    var reader = &in_r.interface;
+    const reader = &in_r.interface;
 
     var dial: u32 = 50;
     var p1: u32, var p2: u32 = .{ 0, 0 };
     for (0..N) |_| {
-        const l = try reader.takeDelimiterExclusive('\n');
-        _ = try reader.takeByte();
+        const l = (try reader.takeDelimiter('\n')).?;
         const dir = l[0];
         var val = try std.fmt.parseInt(u32, l[1..], 10);
 
