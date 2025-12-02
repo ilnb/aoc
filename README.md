@@ -1,3 +1,4 @@
 # Advent of Code
 
-Just playing around and having fun. :)
+24 - Just playing around and having fun. :)
+25 - ZigZag
