@@ -63,8 +63,7 @@ pub fn main() !void {
             try st.append(ga, d);
         }
         var val: u64 = 0;
-        for (st.items, 0..) |n, cnt| {
-            if (cnt == 12) break;
+        for (st.items[0..12]) |n| {
             val += n;
             val *= 10;
         }
