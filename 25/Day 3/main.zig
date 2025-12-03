@@ -64,10 +64,8 @@ pub fn main() !void {
         }
         var val: u64 = 0;
         for (st.items[0..12]) |n| {
-            val += n;
-            val *= 10;
+            val = val * 10 + n;
         }
-        val /= 10;
         p2 += val;
     }
 
