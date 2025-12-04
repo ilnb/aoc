@@ -48,12 +48,12 @@ pub fn main() !void {
         const i: i9 = @intCast(ui);
         for (0..N) |uj| {
             const j: i9 = @intCast(uj);
-            if (!(grid.items[ui][uj] == '@')) continue;
+            if (grid.items[ui][uj] != '@') continue;
 
             var n: u4 = 0;
             for (dirs) |dir| {
-                const x: i9 = i - dir.dx;
-                const y: i9 = j - dir.dy;
+                const x = i - dir.dx;
+                const y = j - dir.dy;
                 if (valid(x, y) and grid.items[@intCast(x)][@intCast(y)] == '@')
                     n += 1;
             }
@@ -62,29 +62,29 @@ pub fn main() !void {
         }
     }
 
-    var prog = true;
     var p2: u32 = 0;
-    while (prog) {
-        prog = false;
+    while (true) {
         var sum: u32 = 0;
-        for (0..N) |i| {
-            for (0..N) |j| {
-                if (!(grid.items[i][j] == '@')) continue;
+        for (0..N) |ui| {
+            const i: i9 = @intCast(ui);
+            for (0..N) |uj| {
+                const j: i9 = @intCast(uj);
+                if (grid.items[ui][uj] != '@') continue;
 
                 var n: u4 = 0;
                 for (dirs) |dir| {
-                    const x: i9 = @as(i9, @intCast(i)) - dir.dx;
-                    const y: i9 = @as(i9, @intCast(j)) - dir.dy;
+                    const x = i - dir.dx;
+                    const y = j - dir.dy;
                     if (valid(x, y) and grid.items[@intCast(x)][@intCast(y)] == '@')
                         n += 1;
                 }
                 if (n < 4) {
                     sum += 1;
-                    grid.items[i][j] = '.';
+                    grid.items[ui][uj] = '.';
                 }
             }
         }
-        if (sum != 0) prog = true;
+        if (sum == 0) break;
         p2 += sum;
     }
 
