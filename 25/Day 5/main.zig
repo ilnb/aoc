@@ -44,8 +44,8 @@ pub fn main() !void {
 
     for (nums.items) |*n| {
         var found = false;
-        for (ranges.items) |range| {
-            if (range[0] <= n.* and n.* <= range[1]) {
+        for (ranges.items) |r| {
+            if (r[0] <= n.* and n.* <= r[1]) {
                 found = true;
                 break;
             }
@@ -84,8 +84,7 @@ pub fn main() !void {
 
     var p2: u64 = 0;
     for (ranges.items) |r| {
-        const count = r[1] - r[0] + 1;
-        p2 += count;
+        p2 += r[1] - r[0] + 1;
     }
 
     var stdout_buf: [20]u8 = undefined;
