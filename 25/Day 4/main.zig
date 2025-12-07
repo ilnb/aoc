@@ -2,11 +2,11 @@ const std = @import("std");
 const N = 138;
 
 pub fn main() !void {
-    const in_file = try std.fs.cwd().openFile("input", .{ .mode = .read_only });
-    defer in_file.close();
-    var in_buf: [150]u8 = undefined;
-    var in_r = in_file.reader(&in_buf);
-    const reader = &in_r.interface;
+    const file = try std.fs.cwd().openFile("input", .{ .mode = .read_only });
+    defer file.close();
+    var file_buf: [150]u8 = undefined;
+    var file_r = file.reader(&file_buf);
+    const reader = &file_r.interface;
 
     var gpa = std.heap.DebugAllocator(.{}){};
     defer {

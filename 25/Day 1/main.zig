@@ -1,17 +1,20 @@
 const std = @import("std");
-const N = 4664;
 
 pub fn main() !void {
-    const in_file = try std.fs.cwd().openFile("input", .{ .mode = .read_only });
-    defer in_file.close();
-    var in_buf: [100]u8 = undefined;
-    var in_r = in_file.reader(&in_buf);
-    const reader = &in_r.interface;
+    const file = try std.fs.cwd().openFile("input", .{ .mode = .read_only });
+    defer file.close();
+    var file_buf: [100]u8 = undefined;
+    var file_r = file.reader(&file_buf);
+    const reader = &file_r.interface;
 
     var dial: u32 = 50;
     var p1: u32, var p2: u32 = .{ 0, 0 };
-    for (0..N) |_| {
-        const l = (try reader.takeDelimiter('\n')).?;
+    while (true) {
+        const _l = try reader.takeDelimiter('\n');
+        if (_l == null) break;
+
+        const l = _l.?;
+
         const dir = l[0];
         var val = try std.fmt.parseInt(u32, l[1..], 10);
 

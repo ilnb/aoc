@@ -1,16 +1,18 @@
 const std = @import("std");
-const N = 41;
 
 pub fn main() !void {
-    const in_file = try std.fs.cwd().openFile("input", .{ .mode = .read_only });
-    defer in_file.close();
-    var in_buf: [512]u8 = undefined;
-    var in_r = in_file.reader(&in_buf);
-    const reader = &in_r.interface;
+    const file = try std.fs.cwd().openFile("input", .{ .mode = .read_only });
+    defer file.close();
+    var file_buf: [512]u8 = undefined;
+    var file_r = file.reader(&file_buf);
+    const reader = &file_r.interface;
 
     var p1: u64, var p2: u64 = .{ 0, 0 };
-    for (0..N) |_| {
-        const line = (try reader.takeDelimiter('\n')).?;
+    while (true) {
+        const _l = try reader.takeDelimiter('\n');
+        if (_l == null) break;
+
+        const line = _l.?;
         var itr = std.mem.tokenizeScalar(u8, line, '-');
         const ls = (itr.next()).?;
         const rs = (itr.next()).?;

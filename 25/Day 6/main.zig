@@ -3,11 +3,11 @@ const N = 4;
 const L = 3772;
 
 pub fn main() !void {
-    const in_file = try std.fs.cwd().openFile("input", .{ .mode = .read_only });
-    defer in_file.close();
-    var in_buf: [4000]u8 = undefined;
-    var in_r = in_file.reader(&in_buf);
-    const reader = &in_r.interface;
+    const file = try std.fs.cwd().openFile("input", .{ .mode = .read_only });
+    defer file.close();
+    var file_buf: [4000]u8 = undefined;
+    var file_r = file.reader(&file_buf);
+    const reader = &file_r.interface;
 
     var gpa = std.heap.DebugAllocator(.{}){};
     defer {

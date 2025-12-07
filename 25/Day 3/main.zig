@@ -1,15 +1,17 @@
 const std = @import("std");
-const N = 200;
 
 pub fn main() !void {
-    var in_file = try std.fs.cwd().openFile("input", .{ .mode = .read_only });
-    var in_buf: [1024]u8 = undefined;
-    var in_r = in_file.reader(&in_buf);
-    var reader = &in_r.interface;
+    var file = try std.fs.cwd().openFile("input", .{ .mode = .read_only });
+    var file_buf: [1024]u8 = undefined;
+    var file_r = file.reader(&file_buf);
+    var reader = &file_r.interface;
 
     var p1: u32 = 0;
-    for (0..N) |_| {
-        const l = (try reader.takeDelimiter('\n')).?;
+    while (true) {
+        const _l = try reader.takeDelimiter('\n');
+        if (_l == null) break;
+
+        const l = _l.?;
 
         var prev: u8, var curr: u8 = .{0} ** 2;
 
@@ -33,15 +35,18 @@ pub fn main() !void {
         p1 += 10 * curr + prev;
     }
 
-    in_file.close();
-    in_file = try std.fs.cwd().openFile("input", .{ .mode = .read_only });
-    in_r = in_file.reader(&in_buf);
-    reader = &in_r.interface;
-    defer in_file.close();
+    file.close();
+    file = try std.fs.cwd().openFile("input", .{ .mode = .read_only });
+    file_r = file.reader(&file_buf);
+    reader = &file_r.interface;
+    defer file.close();
 
     var p2: u64 = 0;
-    for (0..N) |_| {
-        const l = (try reader.takeDelimiter('\n')).?;
+    while (true) {
+        const _l = try reader.takeDelimiter('\n');
+        if (_l == null) break;
+
+        const l = _l.?;
 
         var gpa = std.heap.DebugAllocator(.{}){};
         defer {
