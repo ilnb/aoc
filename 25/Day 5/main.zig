@@ -42,30 +42,40 @@ pub fn main() !void {
         try nums.append(ga, num);
     }
 
+    sortAndMerge(&ranges);
+
     for (nums.items) |*n| {
-        var found = false;
-        for (ranges.items) |r| {
-            if (r[0] <= n.* and n.* <= r[1]) {
-                found = true;
-                break;
+        const items = ranges.items;
+        const idx = std.sort.lowerBound([2]u64, items, n.*, struct {
+            fn lt(ctx: u64, r: [2]u64) std.math.Order {
+                return if (ctx < r[1]) .lt else if (ctx > r[1]) .gt else .eq;
             }
-        }
-        if (!found) n.* = 0;
+        }.lt);
+
+        if (idx == items.len or items[idx][0] > n.*) n.* = 0;
     }
 
     var p1: u64 = 0;
-    for (nums.items) |n| {
-        if (n != 0)
-            p1 += 1;
-    }
+    for (nums.items) |n| p1 += if (n != 0) 1 else 0;
 
+    var p2: u64 = 0;
+    for (ranges.items) |r| p2 += r[1] - r[0] + 1;
+
+    var stdout_buf: [20]u8 = undefined;
+    var stdout_writer = std.fs.File.stdout().writer(&stdout_buf);
+    const stdout = &stdout_writer.interface;
+
+    try stdout.print("p1: {d}\np2: {d}\n", .{ p1, p2 });
+    try stdout.flush();
+}
+
+fn sortAndMerge(ranges: *std.ArrayList([2]u64)) void {
     std.sort.heap([2]u64, ranges.items, {}, struct {
         fn lessThan(_: void, a: [2]u64, b: [2]u64) bool {
             return a[0] < b[0];
         }
     }.lessThan);
 
-    // interval merging
     var idx: usize = 0;
     for (ranges.items[1..]) |r| {
         var prev = &ranges.items[idx];
@@ -81,16 +91,4 @@ pub fn main() !void {
     }
     // rest is garbage
     ranges.shrinkRetainingCapacity(idx + 1);
-
-    var p2: u64 = 0;
-    for (ranges.items) |r| {
-        p2 += r[1] - r[0] + 1;
-    }
-
-    var stdout_buf: [20]u8 = undefined;
-    var stdout_writer = std.fs.File.stdout().writer(&stdout_buf);
-    const stdout = &stdout_writer.interface;
-
-    try stdout.print("p1: {d}\np2: {d}\n", .{ p1, p2 });
-    try stdout.flush();
 }
