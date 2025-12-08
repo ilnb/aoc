@@ -79,7 +79,7 @@ pub fn main() !void {
     for (0..3) |_| p1 *= size_pq.remove();
 
     var p2: u64 = 0;
-    while (pq.items.len != 0 and dsu.ncomps > 1) {
+    while (pq.items.len != 0) {
         const t = pq.remove();
         dsu.join(t.u, t.v);
         if (dsu.ncomps == 1) {
