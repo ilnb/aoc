@@ -71,18 +71,15 @@ pub fn main() !void {
             return std.math.order(b, a);
         }
     }.lt).init(ga, {});
-
     defer size_pq.deinit();
 
     for (dsu.size) |x| try size_pq.add(x);
 
     var p1: u64 = 1;
-    for (0..3) |_| {
-        p1 *= size_pq.remove();
-    }
+    for (0..3) |_| p1 *= size_pq.remove();
 
     var p2: u64 = 0;
-    while (pq.items.len != 0) {
+    while (pq.items.len != 0 and dsu.ncomps > 1) {
         const t = pq.remove();
         dsu.join(t.u, t.v);
         if (dsu.ncomps == 1) {
@@ -96,8 +93,12 @@ pub fn main() !void {
             break;
         }
     }
-    std.debug.print("p1: {d}\n", .{p1});
-    std.debug.print("p2: {d}\n", .{p2});
+
+    var std_w = std.fs.File.stdout().writer(&.{});
+    var stdout = &std_w.interface;
+
+    try stdout.print("p1: {d}\np2: {d}\n", .{ p1, p2 });
+    try stdout.flush();
 }
 
 fn dist(x1: u32, y1: u32, z1: u32, x2: u32, y2: u32, z2: u32) u64 {

@@ -44,6 +44,7 @@ pub fn main() !void {
 
     sortAndMerge(&ranges);
 
+    var p1: u64 = 0;
     for (nums.items) |*n| {
         const items = ranges.items;
         const idx = std.sort.lowerBound([2]u64, items, n.*, struct {
@@ -52,18 +53,14 @@ pub fn main() !void {
             }
         }.lt);
 
-        if (idx == items.len or items[idx][0] > n.*) n.* = 0;
+        p1 += if (idx != items.len and items[idx][0] <= n.*) 1 else 0;
     }
-
-    var p1: u64 = 0;
-    for (nums.items) |n| p1 += if (n != 0) 1 else 0;
 
     var p2: u64 = 0;
     for (ranges.items) |r| p2 += r[1] - r[0] + 1;
 
-    var stdout_buf: [20]u8 = undefined;
-    var stdout_writer = std.fs.File.stdout().writer(&stdout_buf);
-    const stdout = &stdout_writer.interface;
+    var std_w = std.fs.File.stdout().writer(&.{});
+    var stdout = &std_w.interface;
 
     try stdout.print("p1: {d}\np2: {d}\n", .{ p1, p2 });
     try stdout.flush();

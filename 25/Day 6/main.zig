@@ -108,9 +108,8 @@ pub fn main() !void {
         if (oidx == 0) break;
     }
 
-    var stdout_buf: [30]u8 = undefined;
-    var stdout_writer = std.fs.File.stdout().writer(&stdout_buf);
-    const stdout = &stdout_writer.interface;
+    var std_w = std.fs.File.stdout().writer(&.{});
+    var stdout = &std_w.interface;
 
     try stdout.print("p1: {d}\np2: {d}\n", .{ p1, p2 });
     try stdout.flush();

@@ -6,12 +6,28 @@ pub fn main() !void {
     var file_r = file.reader(&file_buf);
     var reader = &file_r.interface;
 
+    var gpa = std.heap.DebugAllocator(.{}){};
+    defer {
+        const status = gpa.deinit();
+        if (status == .leak) std.testing.expect(false) catch @panic("FAILURE");
+    }
+    const ga = gpa.allocator();
+
+    var lines = try std.ArrayList([]u8).initCapacity(ga, 10);
+    defer {
+        for (lines.items) |l| ga.free(l);
+        lines.deinit(ga);
+    }
+
     var p1: u32 = 0;
     while (true) {
         const _l = try reader.takeDelimiter('\n');
         if (_l == null) break;
 
         const l = _l.?;
+        const dup = try ga.alloc(u8, l.len);
+        @memcpy(dup, l);
+        try lines.append(ga, dup);
 
         var prev: u8, var curr: u8 = .{0} ** 2;
 
@@ -35,29 +51,12 @@ pub fn main() !void {
         p1 += 10 * curr + prev;
     }
 
-    file.close();
-    file = try std.fs.cwd().openFile("input", .{ .mode = .read_only });
-    file_r = file.reader(&file_buf);
-    reader = &file_r.interface;
-    defer file.close();
-
     var p2: u64 = 0;
-    while (true) {
-        const _l = try reader.takeDelimiter('\n');
-        if (_l == null) break;
-
-        const l = _l.?;
-
-        var gpa = std.heap.DebugAllocator(.{}){};
-        defer {
-            const status = gpa.deinit();
-            if (status == .leak) std.testing.expect(false) catch @panic("FAILURE");
-        }
-        const ga = gpa.allocator();
-
-        var r = l.len - 12;
+    for (lines.items) |l| {
         var st = try std.ArrayList(u8).initCapacity(ga, 5);
         defer st.deinit(ga);
+
+        var r = l.len - 12;
         const len = &st.items.len;
         for (l) |c| {
             const d = c - '0';
@@ -67,16 +66,14 @@ pub fn main() !void {
             }
             try st.append(ga, d);
         }
+
         var val: u64 = 0;
-        for (st.items[0..12]) |n| {
-            val = val * 10 + n;
-        }
+        for (st.items[0..12]) |n| val = val * 10 + n;
         p2 += val;
     }
 
-    var stdout_buf: [40]u8 = undefined;
-    var stdout_writer = std.fs.File.stdout().writer(&stdout_buf);
-    const stdout = &stdout_writer.interface;
+    var std_w = std.fs.File.stdout().writer(&.{});
+    var stdout = &std_w.interface;
 
     try stdout.print("p1: {d}\np2: {d}\n", .{ p1, p2 });
     try stdout.flush();
