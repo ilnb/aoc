@@ -1,0 +1,111 @@
+const std = @import("std");
+const DSU = @import("dsu.zig").DSU;
+const parseInt = std.fmt.parseInt;
+const N = 1000;
+
+pub fn main() !void {
+    const file = try std.fs.cwd().openFile("input", .{ .mode = .read_only });
+    defer file.close();
+    var file_buf: [128]u8 = undefined;
+    var file_r = file.reader(&file_buf);
+    const reader = &file_r.interface;
+
+    var gpa = std.heap.DebugAllocator(.{}){};
+    defer {
+        const status = gpa.deinit();
+        if (status == .leak) std.testing.expect(false) catch @panic("FAILURE");
+    }
+    const ga = gpa.allocator();
+
+    var lines: [N][]u8 = undefined;
+    for (0..N) |i| {
+        const l = (try reader.takeDelimiter('\n')).?;
+        const dup = try ga.alloc(u8, l.len);
+        @memcpy(dup, l);
+        lines[i] = dup;
+    }
+    defer {
+        for (0..N) |i| ga.free(lines[i]);
+    }
+
+    const Data = struct {
+        d: u64,
+        u: usize,
+        v: usize,
+        fn lt(_: void, a: @This(), b: @This()) std.math.Order {
+            return std.math.order(a.d, b.d);
+        }
+    };
+
+    var pq = std.PriorityQueue(Data, void, Data.lt).init(ga, {});
+    defer pq.deinit();
+
+    for (0..N) |i| {
+        const l1 = lines[i];
+        var it = std.mem.tokenizeScalar(u8, l1, ',');
+        const x1 = try parseInt(u32, (it.next()).?, 10);
+        const y1 = try parseInt(u32, (it.next()).?, 10);
+        const z1 = try parseInt(u32, (it.next()).?, 10);
+        for (i + 1..N) |j| {
+            const l2 = lines[j];
+            it = std.mem.tokenizeScalar(u8, l2, ',');
+            const x2 = try parseInt(u32, (it.next()).?, 10);
+            const y2 = try parseInt(u32, (it.next()).?, 10);
+            const z2 = try parseInt(u32, (it.next()).?, 10);
+
+            const d = dist(x1, y1, z1, x2, y2, z2);
+            try pq.add(.{ .d = d, .u = i, .v = j });
+        }
+    }
+
+    var dsu = try DSU(usize).init(ga, N);
+    defer dsu.deinit();
+
+    for (0..N) |_| {
+        const t = pq.remove();
+        dsu.join(t.u, t.v);
+    }
+
+    var size_pq = std.PriorityQueue(usize, void, struct {
+        fn lt(_: void, a: usize, b: usize) std.math.Order {
+            return std.math.order(b, a);
+        }
+    }.lt).init(ga, {});
+
+    defer size_pq.deinit();
+
+    for (dsu.size) |x| try size_pq.add(x);
+
+    var p1: u64 = 1;
+    for (0..3) |_| {
+        p1 *= size_pq.remove();
+    }
+
+    var p2: u64 = 0;
+    while (pq.items.len != 0) {
+        const t = pq.remove();
+        dsu.join(t.u, t.v);
+        if (dsu.ncomps == 1) {
+            var l1 = lines[t.u];
+            var it = std.mem.tokenizeScalar(u8, l1, ',');
+            const x1: u32 = try parseInt(u32, (it.next()).?, 10);
+            l1 = lines[t.v];
+            it = std.mem.tokenizeScalar(u8, l1, ',');
+            const x2: u32 = try parseInt(u32, (it.next()).?, 10);
+            p2 = x1 * x2;
+            break;
+        }
+    }
+    std.debug.print("p1: {d}\n", .{p1});
+    std.debug.print("p2: {d}\n", .{p2});
+}
+
+fn dist(x1: u32, y1: u32, z1: u32, x2: u32, y2: u32, z2: u32) u64 {
+    const dx = @as(i64, x1) - @as(i64, x2);
+    const dy = @as(i64, y1) - @as(i64, y2);
+    const dz = @as(i64, z1) - @as(i64, z2);
+    var sum: u64 = @intCast(dx * dx);
+    sum += @intCast(dy * dy);
+    sum += @intCast(dz * dz);
+    return sum;
+}
