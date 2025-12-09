@@ -1,7 +1,8 @@
 const std = @import("std");
 const DSU = @import("dsu.zig").DSU;
-const parseInt = std.fmt.parseInt;
 const N = 1000;
+
+const Point = struct { x: u32, y: u32, z: u32 };
 
 pub fn main() !void {
     const file = try std.fs.cwd().openFile("input", .{ .mode = .read_only });
@@ -17,15 +18,13 @@ pub fn main() !void {
     }
     const ga = gpa.allocator();
 
-    var lines: [N][]u8 = undefined;
+    var lines: [N]Point = undefined;
     for (0..N) |i| {
-        const l = (try reader.takeDelimiter('\n')).?;
-        const dup = try ga.alloc(u8, l.len);
-        @memcpy(dup, l);
-        lines[i] = dup;
-    }
-    defer {
-        for (0..N) |i| ga.free(lines[i]);
+        var it = std.mem.tokenizeScalar(u8, (try reader.takeDelimiter('\n')).?, ',');
+        const x = try std.fmt.parseInt(u32, (it.next()).?, 10);
+        const y = try std.fmt.parseInt(u32, (it.next()).?, 10);
+        const z = try std.fmt.parseInt(u32, (it.next()).?, 10);
+        lines[i] = .{ .x = x, .y = y, .z = z };
     }
 
     const Data = struct {
@@ -41,19 +40,8 @@ pub fn main() !void {
     defer pq.deinit();
 
     for (0..N) |i| {
-        const l1 = lines[i];
-        var it = std.mem.tokenizeScalar(u8, l1, ',');
-        const x1 = try parseInt(u32, (it.next()).?, 10);
-        const y1 = try parseInt(u32, (it.next()).?, 10);
-        const z1 = try parseInt(u32, (it.next()).?, 10);
         for (i + 1..N) |j| {
-            const l2 = lines[j];
-            it = std.mem.tokenizeScalar(u8, l2, ',');
-            const x2 = try parseInt(u32, (it.next()).?, 10);
-            const y2 = try parseInt(u32, (it.next()).?, 10);
-            const z2 = try parseInt(u32, (it.next()).?, 10);
-
-            const d = dist(x1, y1, z1, x2, y2, z2);
+            const d = dist(lines[i], lines[j]);
             try pq.add(.{ .d = d, .u = i, .v = j });
         }
     }
@@ -83,12 +71,8 @@ pub fn main() !void {
         const t = pq.remove();
         dsu.join(t.u, t.v);
         if (dsu.ncomps == 1) {
-            var l1 = lines[t.u];
-            var it = std.mem.tokenizeScalar(u8, l1, ',');
-            const x1: u32 = try parseInt(u32, (it.next()).?, 10);
-            l1 = lines[t.v];
-            it = std.mem.tokenizeScalar(u8, l1, ',');
-            const x2: u32 = try parseInt(u32, (it.next()).?, 10);
+            const x1 = lines[t.u].x;
+            const x2 = lines[t.v].x;
             p2 = x1 * x2;
             break;
         }
@@ -101,10 +85,14 @@ pub fn main() !void {
     try stdout.flush();
 }
 
-fn dist(x1: u32, y1: u32, z1: u32, x2: u32, y2: u32, z2: u32) u64 {
+fn dist(p1: Point, p2: Point) u64 {
+    const x1, const y1, const z1 = .{ p1.x, p1.y, p1.z };
+    const x2, const y2, const z2 = .{ p2.x, p2.y, p2.z };
+
     const dx = @as(i64, x1) - @as(i64, x2);
     const dy = @as(i64, y1) - @as(i64, y2);
     const dz = @as(i64, z1) - @as(i64, z2);
+
     var sum: u64 = @intCast(dx * dx);
     sum += @intCast(dy * dy);
     sum += @intCast(dz * dz);
