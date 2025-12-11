@@ -22,9 +22,7 @@ pub fn main() !void {
     }
     for (0..N) |_| {
         const l = (try reader.takeDelimiter('\n')).?;
-        const str = try ga.alloc(u8, l.len);
-        @memcpy(str, l);
-        try grid.append(ga, str);
+        try grid.append(ga, try ga.dupe(u8, l));
     }
 
     const Dir = packed struct {

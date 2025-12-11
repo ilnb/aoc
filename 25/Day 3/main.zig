@@ -25,9 +25,7 @@ pub fn main() !void {
         if (_l == null) break;
 
         const l = _l.?;
-        const dup = try ga.alloc(u8, l.len);
-        @memcpy(dup, l);
-        try lines.append(ga, dup);
+        try lines.append(ga, try ga.dupe(u8, l));
 
         var prev: u8, var curr: u8 = .{0} ** 2;
 

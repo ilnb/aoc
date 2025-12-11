@@ -32,9 +32,7 @@ pub fn main() !void {
         try nums.append(ga, std.ArrayList(u64){});
 
         const l = (try reader.takeDelimiter('\n')).?;
-        const cp = try ga.alloc(u8, l.len);
-        @memcpy(cp, l);
-        try lines.append(ga, cp);
+        try lines.append(ga, try ga.dupe(u8, l));
 
         var itr = std.mem.tokenizeScalar(u8, l, ' ');
         while (itr.next()) |nbuf| {
