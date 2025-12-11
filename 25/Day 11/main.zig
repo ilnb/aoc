@@ -18,18 +18,14 @@ pub fn main() !void {
     var node_map = std.StringHashMap(u12).init(ga);
     defer {
         var itr = node_map.keyIterator();
-        while (itr.next()) |key| {
-            ga.free(key.*);
-        }
+        while (itr.next()) |key| ga.free(key.*);
         node_map.deinit();
     }
 
     var graph = std.AutoHashMap(u12, AL(u12)).init(ga);
     defer {
-        var itr = graph.iterator();
-        while (itr.next()) |e| {
-            e.value_ptr.deinit(ga);
-        }
+        var itr = graph.valueIterator();
+        while (itr.next()) |v| v.deinit(ga);
         graph.deinit();
     }
 
@@ -148,7 +144,6 @@ fn topoSort(ga: std.mem.Allocator, graph: *std.AutoHashMap(u12, AL(u12))) !AL(u1
     while (h < q.items.len) {
         const u = q.items[h];
         h += 1;
-
         try ret.append(ga, u);
 
         const uptr = graph.getPtr(u) orelse continue;
