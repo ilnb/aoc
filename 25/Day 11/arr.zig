@@ -6,7 +6,7 @@ pub fn main() !void {
     defer file.close();
     var file_buf: [128]u8 = undefined;
     var file_r = file.reader(&file_buf);
-    var reader = &file_r.interface;
+    const reader = &file_r.interface;
 
     var gpa = std.heap.DebugAllocator(.{}){};
     defer {
@@ -14,6 +14,13 @@ pub fn main() !void {
         if (status == .leak) std.testing.expect(false) catch @panic("FAILURE");
     }
     const ga = gpa.allocator();
+
+    var graph = try AL(AL(u12)).initCapacity(ga, 10);
+    for (0..10) |_| try graph.append(ga, AL(u12){});
+    defer {
+        for (graph.items) |*l| l.deinit(ga);
+        graph.deinit(ga);
+    }
 
     var node_map = std.StringHashMap(u12).init(ga);
     defer {
@@ -32,35 +39,21 @@ pub fn main() !void {
         if (node_map.get(p) == null) {
             try node_map.put(try ga.dupe(u8, p), idx);
             idx += 1;
+            if (idx == graph.items.len + 1) {
+                try graph.append(ga, try AL(u12).initCapacity(ga, 10));
+            }
         }
+
+        const pidx = node_map.get(p).?;
 
         while (itr.next()) |node| {
             if (node_map.get(node) == null) {
                 try node_map.put(try ga.dupe(u8, node), idx);
                 idx += 1;
+                if (idx == graph.items.len + 1) {
+                    try graph.append(ga, try AL(u12).initCapacity(ga, 10));
+                }
             }
-        }
-    }
-
-    file_r = file.reader(&file_buf);
-    reader = &file_r.interface;
-
-    var graph = try AL(AL(u12)).initCapacity(ga, idx);
-    for (0..idx) |_| try graph.append(ga, AL(u12){});
-    defer {
-        for (graph.items) |*l| l.deinit(ga);
-        graph.deinit(ga);
-    }
-
-    while (true) {
-        const _l = try reader.takeDelimiter('\n');
-        if (_l == null) break;
-
-        var itr = std.mem.tokenizeAny(u8, _l.?, ": ");
-        const p = itr.next().?;
-        const pidx = node_map.get(p).?;
-
-        while (itr.next()) |node| {
             const nidx = node_map.get(node).?;
             try graph.items[pidx].append(ga, nidx);
         }
@@ -136,9 +129,7 @@ fn topoSort(ga: std.mem.Allocator, graph: *AL(AL(u12))) !AL(u12) {
     for (0..n) |_| try indeg.append(ga, 0);
 
     for (graph.items) |u| {
-        for (u.items) |v| {
-            indeg.items[v] += 1;
-        }
+        for (u.items) |v| indeg.items[v] += 1;
     }
 
     var q = try AL(u12).initCapacity(ga, 5);
