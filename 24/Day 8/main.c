@@ -9,13 +9,9 @@ typedef struct pair {
 DEF_DA(da, pair);
 
 #define N 50
-
 #define is_d(c) (c >= '0' && c <= '9')
-
 #define is_a(c) (c >= 'a' && c <= 'z')
-
 #define is_A(c) (c >= 'A' && c <= 'Z')
-
 #define valid_idx(nx, ny) (nx >= 0 && nx < N && ny >= 0 && ny < N)
 
 int **mat(int m, int n) {
@@ -51,14 +47,15 @@ int main() {
     char buf[N + 1];
     fscanf(f, "%s\n", buf);
     for (int j = 0; j < N; ++j) {
-      if (buf[j] == '.')
+      char c = buf[j];
+      if (c == '.')
         continue;
-      else if (is_a(buf[j]))
-        da_push(&a_arr[buf[j] - 'a'], (pair){i, j});
-      else if (is_A(buf[j]))
-        da_push(&A_arr[buf[j] - 'A'], (pair){i, j});
-      else if (is_d(buf[j]))
-        da_push(&d_arr[buf[j] - '0'], (pair){i, j});
+      else if (is_a(c))
+        da_push(&a_arr[c - 'a'], (pair){i, j});
+      else if (is_A(c))
+        da_push(&A_arr[c - 'A'], (pair){i, j});
+      else if (is_d(c))
+        da_push(&d_arr[c - '0'], (pair){i, j});
       else
         assert(0 && "well wtf");
     }
@@ -125,23 +122,18 @@ void get_antinodes2(da *arr, int **anodes) {
     pair pi = da_at(*arr, i);
     for (int j = i + 1; j < n; ++j) {
       pair pj = da_at(*arr, j);
-      int dx = pj.x - pi.x;
-      int dy = pj.y - pi.y;
+      int dx = pj.x - pi.x, dy = pj.y - pi.y;
       int g = gcd(abs(dx), abs(dy));
-      int step_x = dx / g;
-      int step_y = dy / g;
+      int step_x = dx / g, step_y = dy / g;
       int x = pi.x, y = pi.y;
       while (valid_idx(x, y)) {
         anodes[x][y] = 1;
-        x += step_x;
-        y += step_y;
+        x += step_x, y += step_y;
       }
-      x = pi.x - step_x;
-      y = pi.y - step_y;
+      x = pi.x - step_x, y = pi.y - step_y;
       while (valid_idx(x, y)) {
         anodes[x][y] = 1;
-        x -= step_x;
-        y -= step_y;
+        x -= step_x, y -= step_y;
       }
     }
   }
