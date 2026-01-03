@@ -67,7 +67,7 @@ pub fn main() !void {
 }
 
 fn sortAndMerge(ranges: *std.ArrayList([2]u64)) void {
-    std.sort.heap([2]u64, ranges.items, {}, struct {
+    std.mem.sort([2]u64, ranges.items, {}, struct {
         fn lessThan(_: void, a: [2]u64, b: [2]u64) bool {
             return a[0] < b[0];
         }
