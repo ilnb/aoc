@@ -1,7 +1,7 @@
 const std = @import("std");
 
 pub fn DSU(comptime T: type) type {
-    return struct {
+    const dsu = struct {
         const Self = @This();
         parent: []T,
         size: []T,
@@ -51,4 +51,5 @@ pub fn DSU(comptime T: type) type {
             return self.find(a) == self.find(b);
         }
     };
+    return dsu;
 }

@@ -1,17 +1,26 @@
 const std = @import("std");
 
 pub fn main() !void {
-    var file = try std.fs.cwd().openFile("input", .{ .mode = .read_only });
-    var file_buf: [1024]u8 = undefined;
-    var file_r = file.reader(&file_buf);
-    var reader = &file_r.interface;
-
     var gpa = std.heap.DebugAllocator(.{}){};
     defer {
         const status = gpa.deinit();
         if (status == .leak) std.testing.expect(false) catch @panic("FAILURE");
     }
     const ga = gpa.allocator();
+
+    const args = try std.process.argsAlloc(ga);
+    defer std.process.argsFree(ga, args);
+
+    if (args.len < 2) {
+        std.debug.print("Provide the input file from cmdline\n", .{});
+        return error.ExpectedArgument;
+    }
+
+    const file = try std.fs.cwd().openFile(args[1], .{ .mode = .read_only });
+    defer file.close();
+    var file_buf: [128]u8 = undefined;
+    var file_r = file.reader(&file_buf);
+    const reader = &file_r.interface;
 
     var lines = try std.ArrayList([]u8).initCapacity(ga, 10);
     defer {

@@ -2,12 +2,6 @@ const std = @import("std");
 const AL = std.ArrayList;
 
 pub fn main() !void {
-    const file = try std.fs.cwd().openFile("input", .{ .mode = .read_only });
-    defer file.close();
-    var file_buf: [128]u8 = undefined;
-    var file_r = file.reader(&file_buf);
-    const reader = &file_r.interface;
-
     var gpa = std.heap.DebugAllocator(.{}){};
     defer {
         const status = gpa.deinit();
@@ -15,18 +9,32 @@ pub fn main() !void {
     }
     const ga = gpa.allocator();
 
-    var graph = try AL(AL(u12)).initCapacity(ga, 10);
-    for (0..10) |_| try graph.append(ga, AL(u12){});
-    defer {
-        for (graph.items) |*l| l.deinit(ga);
-        graph.deinit(ga);
+    const args = try std.process.argsAlloc(ga);
+    defer std.process.argsFree(ga, args);
+
+    if (args.len < 2) {
+        std.debug.print("Provide the input file from cmdline\n", .{});
+        return error.ExpectedArgument;
     }
+
+    const file = try std.fs.cwd().openFile(args[1], .{ .mode = .read_only });
+    defer file.close();
+    var file_buf: [128]u8 = undefined;
+    var file_r = file.reader(&file_buf);
+    const reader = &file_r.interface;
 
     var node_map = std.StringHashMap(u12).init(ga);
     defer {
         var itr = node_map.keyIterator();
         while (itr.next()) |key| ga.free(key.*);
         node_map.deinit();
+    }
+
+    var graph = try AL(AL(u12)).initCapacity(ga, 10);
+    for (0..10) |_| try graph.append(ga, AL(u12).empty);
+    defer {
+        for (graph.items) |*l| l.deinit(ga);
+        graph.deinit(ga);
     }
 
     var idx: u12 = 0;
