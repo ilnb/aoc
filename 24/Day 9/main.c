@@ -2,7 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int unwrap(char *buf) {
+int unwrap(char *buf)
+{
   int len = 0;
   while (*buf)
     len += *buf++ - '0';
@@ -11,7 +12,8 @@ int unwrap(char *buf) {
 
 #define N 20000
 
-int main() {
+int main()
+{
   char buf[N];
   FILE *f = fopen("input", "r");
   fscanf(f, "%s\n", buf);

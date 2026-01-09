@@ -9,7 +9,8 @@ typedef uint64_t ull;
 typedef unsigned char uc;
 uc check(int *, int, int, ull, ull);
 
-int main() {
+int main()
+{
   FILE *f = fopen("input", "r");
   assert(f && "input file missing");
   ull p1 = 0, p2 = 0;
@@ -39,7 +40,8 @@ int main() {
   return 0;
 }
 
-uc check(int *arr, int n, int idx, ull v, ull t) {
+uc check(int *arr, int n, int idx, ull v, ull t)
+{
   if (idx == n)
     return v == t ? 3 : 0;
 

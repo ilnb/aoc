@@ -11,13 +11,15 @@ typedef struct rule {
 int checkUpdate(rule *, int *, int);
 void fixer(rule *, int *, int);
 
-void swap(int *a, int *b) {
+void swap(int *a, int *b)
+{
   int t = *a;
   *a = *b;
   *b = t;
 }
 
-int main(void) {
+int main(void)
+{
   rule *rules = malloc(RULES * sizeof(rule));
   FILE *fp = fopen("input.txt", "r");
   int ordered = 0, rest = 0;
@@ -64,7 +66,8 @@ int main(void) {
   return 0;
 }
 
-int checkUpdate(rule *rules, int *updates, int count) {
+int checkUpdate(rule *rules, int *updates, int count)
+{
   int flag = 1;
   for (int j = 0; j < count; j++)
     for (int k = 0; k < count; k++) {
@@ -82,7 +85,8 @@ int checkUpdate(rule *rules, int *updates, int count) {
   return flag;
 }
 
-void fixer(rule *rules, int *kek, int count) {
+void fixer(rule *rules, int *kek, int count)
+{
   for (int j = 0; j < count; j++)
     for (int k = 0; k < count; k++)
       for (int l = 0; l < RULES; l++)

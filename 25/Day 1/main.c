@@ -2,7 +2,8 @@
 #include <stdio.h>
 #define N 4664
 
-int main() {
+int main()
+{
   FILE *f = fopen("input", "r");
   int p1 = 0, p2 = 0;
   int dial = 50;

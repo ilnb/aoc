@@ -8,7 +8,8 @@ typedef struct data {
   char *str;
 } data;
 
-int main(void) {
+int main(void)
+{
   int xmas = 0;
   FILE *fp = fopen("input.txt", "r");
   data *line = malloc(LEN * sizeof(data));
@@ -25,8 +26,7 @@ int main(void) {
   for (int i = 0; i < LEN; i++)
     for (int j = 0; j < LEN; j++)
       if (line[j].str[i] == 'X' || line[j].str[i] == 'S')
-        if (!strncmp(line[j].str + i, "XMAS", 4) ||
-            !strncmp(line[j].str + i, "SAMX", 4))
+        if (!strncmp(line[j].str + i, "XMAS", 4) || !strncmp(line[j].str + i, "SAMX", 4))
           xmas++;
   // vertical
   for (int i = 0; i < LEN; i++)
@@ -66,20 +66,14 @@ int main(void) {
         if ((line[j + 1].str[i - 1] == 'M' && line[j - 1].str[i - 1] == 'M' &&
              line[j + 1].str[i + 1] == 'S' && line[j - 1].str[i + 1] == 'S'))
           mas++;
-        else if ((line[j + 1].str[i - 1] == 'S' &&
-                  line[j - 1].str[i - 1] == 'S' &&
-                  line[j + 1].str[i + 1] == 'M' &&
-                  line[j - 1].str[i + 1] == 'M'))
+        else if ((line[j + 1].str[i - 1] == 'S' && line[j - 1].str[i - 1] == 'S' &&
+                  line[j + 1].str[i + 1] == 'M' && line[j - 1].str[i + 1] == 'M'))
           mas++;
-        else if ((line[j + 1].str[i - 1] == 'M' &&
-                  line[j + 1].str[i + 1] == 'M' &&
-                  line[j - 1].str[i - 1] == 'S' &&
-                  line[j - 1].str[i + 1] == 'S'))
+        else if ((line[j + 1].str[i - 1] == 'M' && line[j + 1].str[i + 1] == 'M' &&
+                  line[j - 1].str[i - 1] == 'S' && line[j - 1].str[i + 1] == 'S'))
           mas++;
-        else if ((line[j + 1].str[i - 1] == 'S' &&
-                  line[j + 1].str[i + 1] == 'S' &&
-                  line[j - 1].str[i - 1] == 'M' &&
-                  line[j - 1].str[i + 1] == 'M'))
+        else if ((line[j + 1].str[i - 1] == 'S' && line[j + 1].str[i + 1] == 'S' &&
+                  line[j - 1].str[i - 1] == 'M' && line[j - 1].str[i + 1] == 'M'))
           mas++;
       }
   printf("xmas: %d\nmas: %d\n", xmas, mas);

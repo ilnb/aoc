@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main() {
+int main()
+{
   FILE *f = fopen("input.txt", "r");
   int s1 = 0;
   char c;

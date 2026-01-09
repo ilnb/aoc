@@ -12,7 +12,8 @@ int dirs[4][2] = {
     {0, 1},
 };
 
-void dfs(int mat[N][N], int vis[N][N], int x, int y, int curr) {
+void dfs(int mat[N][N], int vis[N][N], int x, int y, int curr)
+{
   if (curr == 9) {
     vis[x][y]++;
     return;
@@ -27,7 +28,8 @@ void dfs(int mat[N][N], int vis[N][N], int x, int y, int curr) {
   }
 }
 
-int main() {
+int main()
+{
   char buf[40];
   FILE *f = fopen("input", "r");
 

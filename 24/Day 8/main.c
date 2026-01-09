@@ -14,7 +14,8 @@ DEF_DA(da, pair);
 #define is_A(c) (c >= 'A' && c <= 'Z')
 #define valid_idx(nx, ny) (nx >= 0 && nx < N && ny >= 0 && ny < N)
 
-int **mat(int m, int n) {
+int **mat(int m, int n)
+{
   void **p = malloc(sizeof(int *) * m);
   char *d = calloc(m * n, sizeof(int));
   for (int i = 0; i < m; i++)
@@ -22,7 +23,8 @@ int **mat(int m, int n) {
   return (int **)p;
 }
 
-int gcd(int a, int b) {
+int gcd(int a, int b)
+{
   while (b) {
     int t = b;
     b = a % b;
@@ -34,7 +36,8 @@ int gcd(int a, int b) {
 void get_antinodes(da *, int **);
 void get_antinodes2(da *, int **);
 
-int main() {
+int main()
+{
   FILE *f = fopen("input", "r");
   da d_arr[10], a_arr[26], A_arr[26];
   for (int i = 0; i < 26; ++i)
@@ -99,7 +102,8 @@ int main() {
   return 0;
 }
 
-void get_antinodes(da *arr, int **anodes) {
+void get_antinodes(da *arr, int **anodes)
+{
   size_t n = arr->size;
   for (int i = 0; i < n; ++i) {
     pair pi = da_at(*arr, i);
@@ -116,7 +120,8 @@ void get_antinodes(da *arr, int **anodes) {
   }
 }
 
-void get_antinodes2(da *arr, int **anodes) {
+void get_antinodes2(da *arr, int **anodes)
+{
   size_t n = arr->size;
   for (int i = 0; i < n; ++i) {
     pair pi = da_at(*arr, i);
