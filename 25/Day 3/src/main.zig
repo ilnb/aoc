@@ -30,10 +30,8 @@ pub fn main() !void {
 
     var p1: u32 = 0;
     while (true) {
-        const _l = try reader.takeDelimiter('\n');
-        if (_l == null) break;
+        const l = try reader.takeDelimiter('\n') orelse break;
 
-        const l = _l.?;
         try lines.append(ga, try ga.dupe(u8, l));
 
         var prev: u8, var curr: u8 = .{0} ** 2;

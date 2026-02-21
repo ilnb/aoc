@@ -23,6 +23,7 @@ pub fn DSU(comptime T: type) type {
         pub fn deinit(self: *Self) void {
             self.alloc.free(self.parent);
             self.alloc.free(self.size);
+            self.ncomps = 0;
         }
 
         pub fn find(self: *Self, x: T) T {
@@ -30,6 +31,12 @@ pub fn DSU(comptime T: type) type {
             while (self.parent[r] != r) {
                 self.parent[r] = self.parent[self.parent[r]];
                 r = self.parent[r];
+            }
+            var t = x;
+            while (t != r) {
+                const next = self.parent[t];
+                self.parent[t] = r;
+                t = next;
             }
             return r;
         }

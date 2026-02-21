@@ -30,10 +30,8 @@ pub fn main() !void {
     defer points.deinit(ga);
 
     while (true) {
-        const _l = try reader.takeDelimiter('\n');
-        if (_l == null) break;
+        const l = try reader.takeDelimiter('\n') orelse break;
 
-        const l = _l.?;
         var itr = std.mem.tokenizeScalar(u8, l, ',');
         const x = try std.fmt.parseInt(u32, (itr.next()).?, 10);
         const y = try std.fmt.parseInt(u32, (itr.next()).?, 10);

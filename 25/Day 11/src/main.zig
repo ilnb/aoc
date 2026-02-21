@@ -39,10 +39,9 @@ pub fn main() !void {
 
     var idx: u12 = 0;
     while (true) {
-        const _l = try reader.takeDelimiter('\n');
-        if (_l == null) break;
+        const l = try reader.takeDelimiter('\n') orelse break;
 
-        var itr = std.mem.tokenizeAny(u8, _l.?, ": ");
+        var itr = std.mem.tokenizeAny(u8, l, ": ");
         const p = itr.next().?;
         if (node_map.get(p) == null) {
             try node_map.put(try ga.dupe(u8, p), idx);

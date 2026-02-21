@@ -21,7 +21,7 @@ pub fn main() !void {
 
     const file = try std.fs.cwd().openFile(args[1], .{ .mode = .read_only });
     defer file.close();
-    var file_buf: [128]u8 = undefined;
+    var file_buf: [256]u8 = undefined;
     var file_r = file.reader(&file_buf);
     const reader = &file_r.interface;
 
@@ -53,10 +53,8 @@ pub fn main() !void {
     }
 
     while (true) {
-        const _l = try reader.takeDelimiter('\n');
-        if (_l == null) break;
+        const l = try reader.takeDelimiter('\n') orelse break;
 
-        const l = _l.?;
         var itr = std.mem.tokenizeScalar(u8, l, ' ');
         var m: Machine = .{
             .config = undefined,

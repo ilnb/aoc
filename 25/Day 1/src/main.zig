@@ -25,10 +25,7 @@ pub fn main() !void {
     var dial: u32 = 50;
     var p1: u32, var p2: u32 = .{ 0, 0 };
     while (true) {
-        const _l = try reader.takeDelimiter('\n');
-        if (_l == null) break;
-
-        const l = _l.?;
+        const l = try reader.takeDelimiter('\n') orelse break;
 
         const dir = l[0];
         var val = try std.fmt.parseInt(u32, l[1..], 10);

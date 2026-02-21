@@ -40,10 +40,7 @@ pub fn main() !void {
     defer nums.deinit(ga);
 
     while (true) {
-        const _l = (try reader.takeDelimiter('\n'));
-        if (_l == null) break;
-
-        const l = _l.?;
+        const l = try reader.takeDelimiter('\n') orelse break;
         if (l.len == 0) break;
 
         const num = try std.fmt.parseInt(u64, l, 10);

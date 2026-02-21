@@ -14,7 +14,7 @@ pub fn build(b: *std.Build) void {
     });
     b.installArtifact(main_exe);
 
-    const main_run_step = b.step("run", "Run main.zig");
+    const main_run_step = b.step("run_main", "Run main.zig");
     const main_cmd = b.addRunArtifact(main_exe);
     main_run_step.dependOn(&main_cmd.step);
     main_cmd.step.dependOn(b.getInstallStep());

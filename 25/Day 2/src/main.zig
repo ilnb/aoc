@@ -24,10 +24,8 @@ pub fn main() !void {
 
     var p1: u64, var p2: u64 = .{ 0, 0 };
     while (true) {
-        const _l = try reader.takeDelimiter('\n');
-        if (_l == null) break;
+        const line = try reader.takeDelimiter('\n') orelse break;
 
-        const line = _l.?;
         var itr = std.mem.tokenizeScalar(u8, line, '-');
         const ls = (itr.next()).?;
         const rs = (itr.next()).?;
