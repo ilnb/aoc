@@ -1,5 +1,6 @@
 const std = @import("std");
 const AL = std.ArrayList;
+const Queue = @import("queue").Queue;
 
 pub fn main() !void {
     var gpa = std.heap.DebugAllocator(.{}){};
@@ -31,18 +32,15 @@ pub fn main() !void {
     }
 
     var graph = try AL(AL(u12)).initCapacity(ga, 10);
-    for (0..10) |_| try graph.append(ga, AL(u12).empty);
+    try graph.appendNTimes(ga, AL(u12).empty, 10);
     defer {
         for (graph.items) |*l| l.deinit(ga);
         graph.deinit(ga);
     }
 
     var idx: u12 = 0;
-    while (true) {
-        const _l = try reader.takeDelimiter('\n');
-        if (_l == null) break;
-
-        var itr = std.mem.tokenizeAny(u8, _l.?, ": ");
+    while (try reader.takeDelimiter('\n')) |l| {
+        var itr = std.mem.tokenizeAny(u8, l, ": ");
         const p = itr.next().?;
         if (node_map.get(p) == null) {
             try node_map.put(try ga.dupe(u8, p), idx);
@@ -111,7 +109,7 @@ fn surfIt(ga: std.mem.Allocator, graph: *AL(AL(u12)), bits: u64) !u64 {
     var dp = try AL([4]u64).initCapacity(ga, n);
     defer dp.deinit(ga);
 
-    for (0..n) |_| try dp.append(ga, [4]u64{ 0, 0, 0, 0 });
+    try dp.appendNTimes(ga, [4]u64{ 0, 0, 0, 0 }, n);
     dp.items[s][0] = 1;
 
     for (topo.items) |u| {
@@ -134,30 +132,27 @@ fn topoSort(ga: std.mem.Allocator, graph: *AL(AL(u12))) !AL(u12) {
 
     var indeg = try AL(u12).initCapacity(ga, n);
     defer indeg.deinit(ga);
-    for (0..n) |_| try indeg.append(ga, 0);
+    try indeg.appendNTimes(ga, 0);
 
     for (graph.items) |u| {
         for (u.items) |v| indeg.items[v] += 1;
     }
 
-    var q = try AL(u12).initCapacity(ga, 5);
-    defer q.deinit(ga);
+    var q = Queue(u12).init(ga);
+    defer q.deinit();
     for (indeg.items, 0..) |d, i| {
-        if (d == 0) try q.append(ga, @intCast(i));
+        if (d == 0) try q.push(@intCast(i));
     }
 
     var ret = try AL(u12).initCapacity(ga, n); // free in surfIt
 
-    var h: usize = 0;
-    while (h < q.items.len) {
-        const u = q.items[h];
-        h += 1;
+    while (q.pop()) |u| {
         try ret.append(ga, u);
         if (u == graph.items.len) continue;
 
         for (graph.items[u].items) |v| {
             indeg.items[v] -= 1;
-            if (indeg.items[v] == 0) try q.append(ga, v);
+            if (indeg.items[v] == 0) try q.push(@intCast(v));
         }
     }
 

@@ -1,5 +1,6 @@
 const std = @import("std");
 const AL = std.ArrayList;
+const Queue = @import("queue").Queue;
 
 pub fn main() !void {
     var gpa = std.heap.DebugAllocator(.{}){};
@@ -109,7 +110,7 @@ fn surfIt(ga: std.mem.Allocator, graph: *std.AutoHashMap(u12, AL(u12)), bits: u6
     var dp = try AL([4]u64).initCapacity(ga, n);
     defer dp.deinit(ga);
 
-    for (0..n) |_| try dp.append(ga, [4]u64{ 0, 0, 0, 0 });
+    try dp.appendNTimes(ga, [4]u64{ 0, 0, 0, 0 }, n);
     dp.items[s][0] = 1;
 
     for (topo.items) |u| {
@@ -132,31 +133,28 @@ fn topoSort(ga: std.mem.Allocator, graph: *std.AutoHashMap(u12, AL(u12))) !AL(u1
 
     var indeg = try AL(u12).initCapacity(ga, n);
     defer indeg.deinit(ga);
-    for (0..n) |_| try indeg.append(ga, 0);
+    try indeg.appendNTimes(ga, 0);
 
     var it = graph.valueIterator();
     while (it.next()) |l| {
         for (l.items) |v| indeg.items[v] += 1;
     }
 
-    var q = try AL(u12).initCapacity(ga, 5);
-    defer q.deinit(ga);
+    var q = Queue(u12).init(ga);
+    defer q.deinit();
     for (indeg.items, 0..) |d, i| {
-        if (d == 0) try q.append(ga, @intCast(i));
+        if (d == 0) try q.push(@intCast(i));
     }
 
     var ret = try AL(u12).initCapacity(ga, n); // free in surfIt
 
-    var h: usize = 0;
-    while (h < q.items.len) {
-        const u = q.items[h];
-        h += 1;
+    while (q.pop()) |u| {
         try ret.append(ga, u);
 
         const uptr = graph.getPtr(u) orelse continue;
         for (uptr.items) |v| {
             indeg.items[v] -= 1;
-            if (indeg.items[v] == 0) try q.append(ga, v);
+            if (indeg.items[v] == 0) try q.push(@intCast(v));
         }
     }
 

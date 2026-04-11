@@ -4,12 +4,21 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
+    const queue = b.createModule(.{
+        .root_source_file = b.path("src/queue.zig"),
+        .optimize = optimize,
+        .target = target,
+    });
+
     const main_exe = b.addExecutable(.{
         .name = "main",
         .root_module = b.createModule(.{
             .root_source_file = b.path("src/main.zig"),
             .optimize = optimize,
             .target = target,
+            .imports = &.{
+                .{ .name = "queue", .module = queue },
+            },
         }),
     });
     b.installArtifact(main_exe);
@@ -25,6 +34,9 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("src/arr.zig"),
             .optimize = optimize,
             .target = target,
+            .imports = &.{
+                .{ .name = "queue", .module = queue },
+            },
         }),
     });
     b.installArtifact(arr_exe);
