@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #define LEN 1000
 
-int safetyCheckPtr(int *arr, int n, int *index)
-{
+int safetyCheckPtr(int *arr, int n, int *index) {
   for (int i = 0; i < n; i++)
     for (int j = 0; j < n; j++)
       if (!arr[i]) {
@@ -23,8 +22,7 @@ int safetyCheckPtr(int *arr, int n, int *index)
   return 1;
 }
 
-int safetyCheck(int *arr, int n)
-{
+int safetyCheck(int *arr, int n) {
   for (int i = 0; i < n; i++)
     for (int j = 0; j < n; j++)
       if (!arr[i])
@@ -39,8 +37,7 @@ int safetyCheck(int *arr, int n)
   return 1;
 }
 
-void elRemove(int *arr, int n, int index)
-{
+void elRemove(int *arr, int n, int index) {
   int *b = malloc(sizeof(int) * (n - 1));
   for (int i = 0; i < index; i++)
     b[i] = arr[i];
@@ -51,8 +48,7 @@ void elRemove(int *arr, int n, int index)
   free(b);
 }
 
-int main()
-{
+int main() {
   FILE *fp = fopen("input.txt", "r");
   int safe = 0, allowed = 0;
   for (int i = 0; i < LEN; i++) {

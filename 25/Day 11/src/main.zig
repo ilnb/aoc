@@ -39,9 +39,7 @@ pub fn main() !void {
     }
 
     var idx: u12 = 0;
-    while (true) {
-        const l = try reader.takeDelimiter('\n') orelse break;
-
+    while (try reader.takeDelimiter('\n')) |l| {
         var itr = std.mem.tokenizeAny(u8, l, ": ");
         const p = itr.next().?;
         if (node_map.get(p) == null) {
@@ -133,7 +131,7 @@ fn topoSort(ga: std.mem.Allocator, graph: *std.AutoHashMap(u12, AL(u12))) !AL(u1
 
     var indeg = try AL(u12).initCapacity(ga, n);
     defer indeg.deinit(ga);
-    try indeg.appendNTimes(ga, 0);
+    try indeg.appendNTimes(ga, 0, n);
 
     var it = graph.valueIterator();
     while (it.next()) |l| {

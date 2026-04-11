@@ -22,31 +22,25 @@ pub fn main() !void {
     var file_r = file.reader(&file_buf);
     const reader = &file_r.interface;
 
-    var lines = try std.ArrayList([]u8).initCapacity(ga, 10);
+    var lines = std.ArrayList([]u8).empty;
     defer {
         for (lines.items) |l| ga.free(l);
         lines.deinit(ga);
     }
 
     var p1: u32 = 0;
-    while (true) {
-        const l = try reader.takeDelimiter('\n') orelse break;
-
+    while (try reader.takeDelimiter('\n')) |l| {
         try lines.append(ga, try ga.dupe(u8, l));
 
         var prev: u8, var curr: u8 = .{0} ** 2;
 
-        var i = l.len - 2;
+        var i: i32 = @intCast(l.len - 2);
         var save: usize = 0;
-        while (i >= 0) {
-            if (l[i] - '0' >= curr) {
-                curr = l[i] - '0';
-                save = i;
-            }
-            if (i > 0) {
-                i -= 1;
-            } else if (i == 0) {
-                break;
+        while (i >= 0) : (i -= 1) {
+            const ii: usize = @intCast(i);
+            if (l[ii] - '0' >= curr) {
+                curr = l[ii] - '0';
+                save = ii;
             }
         }
 
@@ -58,7 +52,7 @@ pub fn main() !void {
 
     var p2: u64 = 0;
     for (lines.items) |l| {
-        var st = try std.ArrayList(u8).initCapacity(ga, 5);
+        var st = std.ArrayList(u8).empty;
         defer st.deinit(ga);
 
         var r = l.len - 12;
@@ -66,7 +60,7 @@ pub fn main() !void {
         for (l) |c| {
             const d = c - '0';
             while (len.* != 0 and r > 0 and st.items[len.* - 1] < d) {
-                st.shrinkRetainingCapacity(len.* - 1);
+                _ = st.pop();
                 r -= 1;
             }
             try st.append(ga, d);

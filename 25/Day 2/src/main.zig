@@ -22,10 +22,8 @@ pub fn main() !void {
     var file_r = file.reader(&file_buf);
     const reader = &file_r.interface;
 
-    var p1: u64, var p2: u64 = .{ 0, 0 };
-    while (true) {
-        const line = try reader.takeDelimiter('\n') orelse break;
-
+    var p1: u64, var p2: u64 = .{0} ** 2;
+    while (try reader.takeDelimiter('\n')) |line| {
         var itr = std.mem.tokenizeScalar(u8, line, '-');
         const ls = (itr.next()).?;
         const rs = (itr.next()).?;

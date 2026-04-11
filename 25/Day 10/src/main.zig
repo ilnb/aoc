@@ -26,9 +26,9 @@ pub fn main() !void {
     const reader = &file_r.interface;
 
     const Machine = struct {
-        config: u16,
-        buttons: std.ArrayList(u16),
-        joltage: std.ArrayList(u16),
+        config: u16 = undefined,
+        buttons: std.ArrayList(u16) = .empty,
+        joltage: std.ArrayList(u16) = .empty,
 
         pub fn format(m: @This(), wr: *std.io.Writer) std.io.Writer.Error!void {
             try wr.print("{b} ", .{m.config});
@@ -43,7 +43,7 @@ pub fn main() !void {
         }
     };
 
-    var machines = try std.ArrayList(Machine).initCapacity(ga, 10);
+    var machines = std.ArrayList(Machine).empty;
     defer {
         for (machines.items) |*m| {
             m.joltage.deinit(ga);
@@ -52,15 +52,9 @@ pub fn main() !void {
         machines.deinit(ga);
     }
 
-    while (true) {
-        const l = try reader.takeDelimiter('\n') orelse break;
-
+    while (try reader.takeDelimiter('\n')) |l| {
         var itr = std.mem.tokenizeScalar(u8, l, ' ');
-        var m: Machine = .{
-            .config = undefined,
-            .buttons = try std.ArrayList(u16).initCapacity(ga, 5),
-            .joltage = try std.ArrayList(u16).initCapacity(ga, 5),
-        };
+        var m = Machine{};
 
         const cfg = itr.next().?;
         m.config = cfg2Mask(cfg[1 .. cfg.len - 1]);

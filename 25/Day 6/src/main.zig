@@ -37,7 +37,7 @@ pub fn main() !void {
     }
 
     for (0..N) |i| {
-        try nums.append(ga, std.ArrayList(u64){});
+        try nums.append(ga, std.ArrayList(u64).empty);
 
         const l = (try reader.takeDelimiter('\n')).?;
         try lines.append(ga, try ga.dupe(u8, l));
@@ -52,13 +52,11 @@ pub fn main() !void {
     var ops = try std.ArrayList(u8).initCapacity(ga, N);
     defer ops.deinit(ga);
 
-    {
-        const l = (try reader.takeDelimiter('\n')).?;
+    const l = (try reader.takeDelimiter('\n')).?;
 
-        var itr = std.mem.tokenizeScalar(u8, l, ' ');
-        while (itr.next()) |entry| {
-            try ops.append(ga, entry[0]);
-        }
+    var itr = std.mem.tokenizeScalar(u8, l, ' ');
+    while (itr.next()) |entry| {
+        try ops.append(ga, entry[0]);
     }
 
     var p1: u64 = 0;
@@ -75,13 +73,14 @@ pub fn main() !void {
     }
 
     var p2: u64 = 0;
-    var ridx: usize = L - 1;
-    var oidx = ops.items.len - 1;
+    var ridx: i32 = @intCast(L - 1);
+    var oidx: i32 = @intCast(ops.items.len - 1);
     while (oidx >= 0) : (oidx -= 1) {
         while (true) {
             var found = false;
+            const ri: usize = @intCast(ridx);
             for (0..N) |i| {
-                if (lines.items[i][ridx] != ' ') {
+                if (lines.items[i][ri] != ' ') {
                     found = true;
                     break;
                 }
@@ -90,13 +89,14 @@ pub fn main() !void {
             ridx -= 1;
         }
 
-        const op = ops.items[oidx];
+        const op = ops.items[@intCast(oidx)];
         var t: u64 = if (op == '+') 0 else 1;
-        while (true) {
+        while (ridx >= 0) {
             var n: u64 = 0;
+            const ri: usize = @intCast(ridx);
             for (0..N) |i| {
-                if (lines.items[i][ridx] != ' ') {
-                    n = n * 10 + lines.items[i][ridx] - '0';
+                if (lines.items[i][ri] != ' ') {
+                    n = n * 10 + lines.items[i][ri] - '0';
                 }
             }
             if (n == 0) break;
@@ -106,12 +106,9 @@ pub fn main() !void {
                 '*' => t *= n,
                 else => unreachable,
             }
-
-            if (ridx == 0) break;
             ridx -= 1;
         }
         p2 += t;
-        if (oidx == 0) break;
     }
 
     var std_w = std.fs.File.stdout().writer(&.{});

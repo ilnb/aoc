@@ -5,24 +5,24 @@ pub fn DSU(comptime T: type) type {
         const Self = @This();
         parent: []T,
         size: []T,
-        alloc: std.mem.Allocator,
+        aa: std.mem.Allocator,
         ncomps: usize,
 
-        pub fn init(alloc: std.mem.Allocator, n: T) !Self {
+        pub fn init(aa: std.mem.Allocator, n: T) !Self {
             if (n <= 0) @panic("size for DSU.init should be positive.");
 
-            const parent = try alloc.alloc(T, n);
-            const size = try alloc.alloc(T, n);
+            const parent = try aa.alloc(T, n);
+            const size = try aa.alloc(T, n);
 
             for (parent, 0..) |*p, i| p.* = @intCast(i);
             for (size) |*s| s.* = 1;
 
-            return .{ .parent = parent, .size = size, .alloc = alloc, .ncomps = n };
+            return .{ .parent = parent, .size = size, .aa = aa, .ncomps = n };
         }
 
         pub fn deinit(self: *Self) void {
-            self.alloc.free(self.parent);
-            self.alloc.free(self.size);
+            self.aa.free(self.parent);
+            self.aa.free(self.size);
             self.ncomps = 0;
         }
 

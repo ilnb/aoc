@@ -23,10 +23,8 @@ pub fn main() !void {
     const reader = &file_r.interface;
 
     var dial: u32 = 50;
-    var p1: u32, var p2: u32 = .{ 0, 0 };
-    while (true) {
-        const l = try reader.takeDelimiter('\n') orelse break;
-
+    var p1: u32, var p2: u32 = .{0} ** 2;
+    while (try reader.takeDelimiter('\n')) |l| {
         const dir = l[0];
         var val = try std.fmt.parseInt(u32, l[1..], 10);
 

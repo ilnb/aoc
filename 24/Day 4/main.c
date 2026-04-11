@@ -8,8 +8,7 @@ typedef struct data {
   char *str;
 } data;
 
-int main(void)
-{
+int main(void) {
   int xmas = 0;
   FILE *fp = fopen("input.txt", "r");
   data *line = malloc(LEN * sizeof(data));

@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #define LEN 1000
 
-void selsort(int *arr, int n)
-{
+void selsort(int *arr, int n) {
   for (int i = 0; i < n - 1; i++) {
     int min = i;
     for (int j = i + 1; j < n; j++)
@@ -15,8 +14,7 @@ void selsort(int *arr, int n)
   }
 }
 
-int main(void)
-{
+int main(void) {
   FILE *fp = fopen("input.txt", "r");
   int *num1 = malloc(sizeof(int) * LEN);
   int *num2 = malloc(sizeof(int) * LEN);

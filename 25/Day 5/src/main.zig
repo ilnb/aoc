@@ -1,4 +1,5 @@
 const std = @import("std");
+const parseInt = std.fmt.parseInt;
 
 pub fn main() !void {
     var gpa = std.heap.DebugAllocator(.{}){};
@@ -22,43 +23,39 @@ pub fn main() !void {
     var file_r = file.reader(&file_buf);
     const reader = &file_r.interface;
 
-    var ranges = try std.ArrayList([2]u64).initCapacity(ga, 10);
+    var ranges = std.ArrayList([2]u64).empty;
     defer ranges.deinit(ga);
 
-    while (true) {
-        const l = (try reader.takeDelimiter('\n')).?;
+    while (try reader.takeDelimiter('\n')) |l| {
         if (l.len == 0) break;
 
         var itr = std.mem.tokenizeScalar(u8, l, '-');
-        const num1: u64 = try std.fmt.parseInt(u64, (itr.next()).?, 10);
-        const num2: u64 = try std.fmt.parseInt(u64, (itr.next()).?, 10);
+        const num1 = try parseInt(u64, (itr.next()).?, 10);
+        const num2 = try parseInt(u64, (itr.next()).?, 10);
 
         try ranges.append(ga, [2]u64{ num1, num2 });
     }
 
-    var nums = try std.ArrayList(u64).initCapacity(ga, 10);
+    var nums = std.ArrayList(u64).empty;
     defer nums.deinit(ga);
 
-    while (true) {
-        const l = try reader.takeDelimiter('\n') orelse break;
-        if (l.len == 0) break;
-
-        const num = try std.fmt.parseInt(u64, l, 10);
+    while (try reader.takeDelimiter('\n')) |l| {
+        const num = try parseInt(u64, l, 10);
         try nums.append(ga, num);
     }
 
     sortAndMerge(&ranges);
 
     var p1: u64 = 0;
-    for (nums.items) |*n| {
+    for (nums.items) |n| {
         const items = ranges.items;
-        const idx = std.sort.lowerBound([2]u64, items, n.*, struct {
+        const idx = std.sort.lowerBound([2]u64, items, n, struct {
             fn lt(ctx: u64, r: [2]u64) std.math.Order {
                 return if (ctx < r[1]) .lt else if (ctx > r[1]) .gt else .eq;
             }
         }.lt);
 
-        p1 += if (idx != items.len and items[idx][0] <= n.*) 1 else 0;
+        p1 += if (idx != items.len and items[idx][0] <= n) 1 else 0;
     }
 
     var p2: u64 = 0;
@@ -73,10 +70,10 @@ pub fn main() !void {
 
 fn sortAndMerge(ranges: *std.ArrayList([2]u64)) void {
     std.mem.sort([2]u64, ranges.items, {}, struct {
-        fn lessThan(_: void, a: [2]u64, b: [2]u64) bool {
+        fn lt(_: void, a: [2]u64, b: [2]u64) bool {
             return a[0] < b[0];
         }
-    }.lessThan);
+    }.lt);
 
     var idx: usize = 0;
     for (ranges.items[1..]) |r| {

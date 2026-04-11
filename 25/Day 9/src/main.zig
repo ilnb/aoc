@@ -29,9 +29,7 @@ pub fn main() !void {
     var points = try std.ArrayList(Point).initCapacity(ga, 10);
     defer points.deinit(ga);
 
-    while (true) {
-        const l = try reader.takeDelimiter('\n') orelse break;
-
+    while (try reader.takeDelimiter('\n')) |l| {
         var itr = std.mem.tokenizeScalar(u8, l, ',');
         const x = try std.fmt.parseInt(u32, (itr.next()).?, 10);
         const y = try std.fmt.parseInt(u32, (itr.next()).?, 10);

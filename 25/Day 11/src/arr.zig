@@ -31,7 +31,7 @@ pub fn main() !void {
         node_map.deinit();
     }
 
-    var graph = try AL(AL(u12)).initCapacity(ga, 10);
+    var graph = AL(AL(u12)).empty;
     try graph.appendNTimes(ga, AL(u12).empty, 10);
     defer {
         for (graph.items) |*l| l.deinit(ga);
@@ -46,7 +46,7 @@ pub fn main() !void {
             try node_map.put(try ga.dupe(u8, p), idx);
             idx += 1;
             if (idx == graph.items.len + 1) {
-                try graph.append(ga, try AL(u12).initCapacity(ga, 10));
+                try graph.append(ga, AL(u12).empty);
             }
         }
 
@@ -57,7 +57,7 @@ pub fn main() !void {
                 try node_map.put(try ga.dupe(u8, node), idx);
                 idx += 1;
                 if (idx == graph.items.len + 1) {
-                    try graph.append(ga, try AL(u12).initCapacity(ga, 10));
+                    try graph.append(ga, AL(u12).empty);
                 }
             }
             const nidx = node_map.get(node).?;
@@ -132,7 +132,7 @@ fn topoSort(ga: std.mem.Allocator, graph: *AL(AL(u12))) !AL(u12) {
 
     var indeg = try AL(u12).initCapacity(ga, n);
     defer indeg.deinit(ga);
-    try indeg.appendNTimes(ga, 0);
+    try indeg.appendNTimes(ga, 0, n);
 
     for (graph.items) |u| {
         for (u.items) |v| indeg.items[v] += 1;

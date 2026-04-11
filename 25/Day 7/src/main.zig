@@ -40,12 +40,10 @@ pub fn main() !void {
     var skip = true;
     var p1: u16 = 0;
     var p2: u64 = 0;
-    while (true) {
-        const l = try reader.takeDelimiter('\n') orelse break;
-
-        const _s = skip;
+    while (try reader.takeDelimiter('\n')) |l| {
+        const s = skip;
         skip = !skip;
-        if (_s) continue;
+        if (s) continue;
 
         for (l, 0..) |c, i| {
             if (c == '^' and tl[i] != 0) {
