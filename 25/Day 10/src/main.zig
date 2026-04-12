@@ -3,6 +3,24 @@
 
 const std = @import("std");
 
+const Machine = struct {
+    config: u16 = undefined,
+    buttons: std.ArrayList(u16) = .empty,
+    joltage: std.ArrayList(u16) = .empty,
+
+    pub fn format(m: @This(), wr: *std.io.Writer) std.io.Writer.Error!void {
+        try wr.print("{b} ", .{m.config});
+        for (m.buttons.items) |btn| {
+            try wr.print("{b}, ", .{btn});
+        }
+        try wr.writeAll("{");
+        for (m.joltage.items) |j| {
+            try wr.print("{d},", .{j});
+        }
+        try wr.writeAll("}");
+    }
+};
+
 pub fn main() !void {
     var gpa = std.heap.DebugAllocator(.{}){};
     defer {
@@ -24,24 +42,6 @@ pub fn main() !void {
     var file_buf: [256]u8 = undefined;
     var file_r = file.reader(&file_buf);
     const reader = &file_r.interface;
-
-    const Machine = struct {
-        config: u16 = undefined,
-        buttons: std.ArrayList(u16) = .empty,
-        joltage: std.ArrayList(u16) = .empty,
-
-        pub fn format(m: @This(), wr: *std.io.Writer) std.io.Writer.Error!void {
-            try wr.print("{b} ", .{m.config});
-            for (m.buttons.items) |btn| {
-                try wr.print("{b}, ", .{btn});
-            }
-            try wr.writeAll("{");
-            for (m.joltage.items) |j| {
-                try wr.print("{d},", .{j});
-            }
-            try wr.writeAll("}");
-        }
-    };
 
     var machines = std.ArrayList(Machine).empty;
     defer {
@@ -78,13 +78,35 @@ pub fn main() !void {
         try machines.append(ga, m);
     }
 
-    var p1: u16, var p2: u16 = .{ 0, 0 };
-    for (machines.items) |m| {
-        var val: u16 = std.math.maxInt(u16);
-        toggleToOn(&val, 0, 0, 0, m.config, m.buttons.items);
-        p1 += val;
-        val = toggleToJolt(m.config, m.buttons.items, m.joltage.items);
-        p2 += val;
+    var p1arr: [8]u16 = .{0} ** 8;
+    var p2arr: [8]u16 = .{0} ** 8;
+    var threads: [8]std.Thread = undefined;
+
+    const N = machines.items.len;
+    const chunk = (N + 7) / 8;
+
+    for (0..8) |i| {
+        const s = i * chunk;
+        const e = @min(s + chunk, N);
+
+        if (s >= N) break;
+
+        threads[i] = try std.Thread.spawn(.{}, worker, .{
+            machines.items,
+            s,
+            e,
+            &p1arr[i],
+            &p2arr[i],
+        });
+    }
+    for (threads) |t| t.join();
+
+    var p1: u16 = 0;
+    var p2: u16 = 0;
+
+    for (0..8) |i| {
+        p1 += p1arr[i];
+        p2 += p2arr[i];
     }
 
     var std_w = std.fs.File.stdout().writer(&.{});
@@ -92,6 +114,29 @@ pub fn main() !void {
 
     try stdout.print("p1: {d}\np2: {d}\n", .{ p1, p2 });
     try stdout.flush();
+}
+
+fn worker(
+    machines: []Machine,
+    s: usize,
+    e: usize,
+    p1: *u16,
+    p2: *u16,
+) void {
+    var lp1: u16 = 0;
+    var lp2: u16 = 0;
+
+    for (machines[s..e]) |m| {
+        var val: u16 = std.math.maxInt(u16);
+        toggleToOn(&val, 0, 0, 0, m.config, m.buttons.items);
+        lp1 += val;
+
+        val = toggleToJolt(m.config, m.buttons.items, m.joltage.items);
+        lp2 += val;
+    }
+
+    p1.* = lp1;
+    p2.* = lp2;
 }
 
 fn toggleToOn(val: *u16, idx: u16, chosen: u16, curr: u16, cfg: u16, buttons: []u16) void {
