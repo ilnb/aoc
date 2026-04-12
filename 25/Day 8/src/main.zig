@@ -47,12 +47,10 @@ pub fn main() !void {
     var pq = std.PriorityQueue(Data, void, Data.lt).init(ga, {});
     defer pq.deinit();
 
-    for (0..N) |i| {
-        for (i + 1..N) |j| {
-            const d = dist(lines[i], lines[j]);
-            try pq.add(.{ .d = d, .u = i, .v = j });
-        }
-    }
+    for (0..N) |i| for (i + 1..N) |j| {
+        const d = dist(lines[i], lines[j]);
+        try pq.add(.{ .d = d, .u = i, .v = j });
+    };
 
     var dsu = try DSU(usize).init(ga, N);
     defer dsu.deinit();
