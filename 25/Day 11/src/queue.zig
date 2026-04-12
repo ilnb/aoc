@@ -1,7 +1,7 @@
 const std = @import("std");
 const DLL = std.DoublyLinkedList;
 
-pub fn Queue(T: type) type {
+pub fn Queue(comptime T: type) type {
     const Data = struct {
         val: T,
         node: DLL.Node = undefined,

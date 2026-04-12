@@ -64,19 +64,21 @@ pub fn main() !void {
 
     var size_pq = std.PriorityQueue(usize, void, struct {
         fn lt(_: void, a: usize, b: usize) std.math.Order {
-            return std.math.order(b, a);
+            return std.math.order(a, b);
         }
     }.lt).init(ga, {});
     defer size_pq.deinit();
 
-    for (dsu.size) |x| try size_pq.add(x);
+    for (dsu.size) |x| {
+        try size_pq.add(x);
+        if (size_pq.items.len > 3) _ = size_pq.remove();
+    }
 
     var p1: u64 = 1;
-    for (0..3) |_| p1 *= size_pq.remove();
+    while (size_pq.removeOrNull()) |v| p1 *= v;
 
     var p2: u64 = 0;
-    while (pq.items.len != 0) {
-        const t = pq.remove();
+    while (pq.removeOrNull()) |t| {
         dsu.join(t.u, t.v);
         if (dsu.ncomps == 1) {
             const x1 = lines[t.u].x;
