@@ -52,11 +52,9 @@ uc check(int *arr, int n, int idx, ull v, ull t) {
   if (v <= t / arr[idx])
     ret |= check(arr, n, idx + 1, v * arr[idx], t);
 
-  int tmp = arr[idx], p = 1;
-  while (tmp > 0) {
+  int p = 1;
+  for (int tmp = arr[idx]; tmp; t /= 10)
     p *= 10;
-    tmp /= 10;
-  }
   v = v * p + arr[idx];
   if (v <= t && check(arr, n, idx + 1, v, t))
     ret |= 2;
