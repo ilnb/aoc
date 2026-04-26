@@ -2,6 +2,13 @@ const std = @import("std");
 const AL = std.ArrayList;
 const Queue = @import("queue").Queue;
 
+const Bit = packed struct {
+    s: u12,
+    e: u12,
+    d: u12,
+    f: u12,
+};
+
 pub fn main() !void {
     var gpa = std.heap.DebugAllocator(.{}){};
     defer {
@@ -70,12 +77,8 @@ pub fn main() !void {
     const s = node_map.get("svr").?;
     const d = node_map.get("dac").?;
     const f = node_map.get("fft").?;
-    var bits: u64 = 0;
-    bits |= s;
-    bits |= @as(u64, e) << 12;
-    bits |= @as(u64, d) << 24;
-    bits |= @as(u64, f) << 36;
-    const p2 = try surfIt(ga, &graph, bits);
+    const bit = Bit{ .s = s, .e = e, .d = d, .f = f };
+    const p2 = try surfIt(ga, &graph, bit);
 
     var std_w = std.fs.File.stdout().writer(&.{});
     var stdout = &std_w.interface;
@@ -94,12 +97,8 @@ fn getOut(u: u12, e: u12, graph: *std.AutoHashMap(u12, AL(u12))) u32 {
     return ret;
 }
 
-fn surfIt(ga: std.mem.Allocator, graph: *std.AutoHashMap(u12, AL(u12)), bits: u64) !u64 {
-    const clr: u12 = 0xFFF;
-    const s: u12 = @intCast(bits & clr);
-    const e: u12 = @intCast((bits >> 12) & clr);
-    const d: u12 = @intCast((bits >> 24) & clr);
-    const f: u12 = @intCast((bits >> 36) & clr);
+fn surfIt(ga: std.mem.Allocator, graph: *std.AutoHashMap(u12, AL(u12)), bit: Bit) !u64 {
+    const s, const e, const d, const f = .{ bit.s, bit.e, bit.d, bit.f };
 
     var topo = try topoSort(ga, graph);
     defer topo.deinit(ga);
