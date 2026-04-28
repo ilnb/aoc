@@ -1,16 +1,13 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define N 40
 
 #define valid_idx(nx, ny) (nx >= 0 && nx < N && ny >= 0 && ny < N)
 
-int dirs[4][2] = {
-    {0, -1},
-    {-1, 0},
-    {1, 0},
-    {0, 1},
-};
+int dirs[5] = {-1, 0, 1, 0, -1};
 
 void dfs(int mat[N][N], int vis[N][N], int x, int y, int curr) {
   if (curr == 9) {
@@ -19,8 +16,8 @@ void dfs(int mat[N][N], int vis[N][N], int x, int y, int curr) {
   }
 
   for (int i = 0; i < 4; ++i) {
-    int nx = x + dirs[i][0];
-    int ny = y + dirs[i][1];
+    int nx = x + dirs[i];
+    int ny = y + dirs[i + 1];
 
     if (valid_idx(nx, ny) && mat[nx][ny] == curr + 1)
       dfs(mat, vis, nx, ny, curr + 1);
@@ -30,6 +27,7 @@ void dfs(int mat[N][N], int vis[N][N], int x, int y, int curr) {
 int main() {
   char buf[40];
   FILE *f = fopen("input", "r");
+  assert(f && "input file missing");
 
   int data[N][N];
   for (int i = 0; i < N; ++i) {
@@ -39,18 +37,19 @@ int main() {
   }
   fclose(f);
 
+  int vis[N][N] = {0};
   size_t p1 = 0, p2 = 0;
   for (int i = 0; i < N; ++i) {
     for (int j = 0; j < N; ++j) {
       if (data[i][j] == 0) {
-        int vis[N][N] = {0};
         dfs(data, vis, i, j, 0);
         for (int i = 0; i < N; ++i) {
           for (int j = 0; j < N; ++j) {
-            p1 += vis[i][j] != 0;
-            p2 += vis[i][j];
+            if (vis[i][j])
+              p1++, p2 += vis[i][j];
           }
         }
+        memset(vis, 0, N * N * sizeof(int));
       }
     }
   }

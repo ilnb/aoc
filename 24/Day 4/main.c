@@ -1,25 +1,23 @@
+#include <assert.h>
 #include <malloc.h>
 #include <stdio.h>
 #include <string.h>
 
 #define LEN 140
 
-typedef struct data {
+typedef struct {
   char *str;
 } data;
 
 int main(void) {
   int xmas = 0;
-  FILE *fp = fopen("input.txt", "r");
+  FILE *f = fopen("input", "r");
+  assert(f && "input file missing");
   data *line = malloc(LEN * sizeof(data));
   for (int j = 0; j < LEN; j++) {
     char c;
-    int i = 0;
-    line[j].str = malloc(LEN);
-    while ((c = fgetc(fp)) != '\n') {
-      line[j].str[i] = c;
-      i++;
-    }
+    line[j].str = malloc(LEN + 1);
+    fscanf(f, "%s\n", line[j].str);
   }
   // horizontal
   for (int i = 0; i < LEN; i++)
@@ -48,7 +46,7 @@ int main(void) {
           xmas++;
       }
   // diagonal backward
-  for (int i = 2; i < LEN; i++)
+  for (int i = 3; i < LEN; i++)
     for (int j = 0; j < LEN - 3; j++)
       if (line[j].str[i] == 'X' || line[j].str[i] == 'S') {
         char s[5] = {0};
@@ -76,7 +74,9 @@ int main(void) {
           mas++;
       }
   printf("xmas: %d\nmas: %d\n", xmas, mas);
+  for (int i = 0; i < LEN; i++)
+    free(line[i].str);
   free(line);
-  fclose(fp);
+  fclose(f);
   return 0;
 }

@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-typedef struct pair {
+typedef struct {
   int x, y;
 } pair;
 
@@ -36,6 +36,7 @@ void get_antinodes2(da *, int **);
 
 int main() {
   FILE *f = fopen("input", "r");
+  assert(f && "input file missing");
   da d_arr[10], a_arr[26], A_arr[26];
   for (int i = 0; i < 26; ++i)
     da_init(a_arr + i);
@@ -102,9 +103,9 @@ int main() {
 void get_antinodes(da *arr, int **anodes) {
   size_t n = arr->size;
   for (int i = 0; i < n; ++i) {
-    pair pi = da_at(*arr, i);
+    pair pi = arr->items[i];
     for (int j = i + 1; j < n; ++j) {
-      pair pj = da_at(*arr, j);
+      pair pj = arr->items[j];
       int xi = pi.x, yi = pi.y;
       int xj = pj.x, yj = pj.y;
       int dx = xi - xj, dy = yi - yj;
@@ -119,9 +120,9 @@ void get_antinodes(da *arr, int **anodes) {
 void get_antinodes2(da *arr, int **anodes) {
   size_t n = arr->size;
   for (int i = 0; i < n; ++i) {
-    pair pi = da_at(*arr, i);
+    pair pi = arr->items[i];
     for (int j = i + 1; j < n; ++j) {
-      pair pj = da_at(*arr, j);
+      pair pj = arr->items[j];
       int dx = pj.x - pi.x, dy = pj.y - pi.y;
       int g = gcd(abs(dx), abs(dy));
       int step_x = dx / g, step_y = dy / g;

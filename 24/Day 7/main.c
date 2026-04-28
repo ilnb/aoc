@@ -5,16 +5,16 @@
 
 #define N 850
 
-typedef uint64_t ull;
-typedef unsigned char uc;
-uc check(int *, int, int, ull, ull);
+typedef uint64_t u64;
+typedef uint8_t u8;
+u8 check(int *, int, int, u64, u64);
 
 int main() {
   FILE *f = fopen("input", "r");
   assert(f && "input file missing");
-  ull p1 = 0, p2 = 0;
+  u64 p1 = 0, p2 = 0;
   for (int i = 0; i < N; ++i) {
-    ull t;
+    u64 t;
     fscanf(f, "%lu:", &t);
     int offset = 0, n = 0;
     char c;
@@ -27,7 +27,7 @@ int main() {
     int *arr = malloc(n * sizeof(int));
     for (int j = 0; j < n; ++j)
       fscanf(f, " %d", arr + j);
-    uc bits = check(arr, n, 1, *arr, t);
+    u8 bits = check(arr, n, 1, *arr, t);
     if (bits & 1)
       p1 += t;
     if (bits & 2)
@@ -39,13 +39,13 @@ int main() {
   return 0;
 }
 
-uc check(int *arr, int n, int idx, ull v, ull t) {
+u8 check(int *arr, int n, int idx, u64 v, u64 t) {
   if (idx == n)
     return v == t ? 3 : 0;
 
-  uc ret = 0;
+  u8 ret = 0;
 
-  ull add = v + arr[idx];
+  u64 add = v + arr[idx];
   if (add <= t)
     ret |= check(arr, n, idx + 1, add, t);
 
@@ -53,7 +53,7 @@ uc check(int *arr, int n, int idx, ull v, ull t) {
     ret |= check(arr, n, idx + 1, v * arr[idx], t);
 
   int p = 1;
-  for (int tmp = arr[idx]; tmp; t /= 10)
+  for (int tmp = arr[idx]; tmp; tmp /= 10)
     p *= 10;
   v = v * p + arr[idx];
   if (v <= t && check(arr, n, idx + 1, v, t))

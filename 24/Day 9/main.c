@@ -2,6 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef struct {
+  int l, r;
+} seg;
+
 int unwrap(char *buf) {
   int len = 0;
   while (*buf)
@@ -19,12 +23,14 @@ int main() {
   int *arr = malloc(sizeof(int) * n);
 
   int id = 0, j = 0;
+  seg *pos = malloc(sizeof(seg) * N / 2);
   for (int i = 0; i < N - 1; ++i) {
     int l = buf[i] - '0';
     if (i & 1) {
       for (int k = j; k < j + l; ++k)
         arr[k] = -1;
     } else {
+      pos[id] = (seg){j, j + l - 1};
       for (int k = j; k < j + l; ++k)
         arr[k] = id;
       id++;
@@ -48,14 +54,7 @@ int main() {
 
   uint64_t p2 = 0;
   for (int t = id - 1; t >= 0; --t) {
-    int l = -1, r = -1;
-    for (int i = 0; i < j; ++i) {
-      if (arr[i] == t) {
-        if (l == -1)
-          l = i;
-        r = i;
-      }
-    }
+    l = pos[t].l, r = pos[t].r;
 
     int len = r - l + 1;
     int best = -1;
@@ -80,8 +79,9 @@ int main() {
     }
 
     if (best != -1) {
-      for (int i = 0; i < len; ++i)
-        arr[best + i] = t;
+      pos[t] = (seg){best, best + len - 1};
+      for (int i = best; i < best + len; ++i)
+        arr[i] = t;
       for (int i = l; i <= r; ++i)
         arr[i] = -1;
     }
@@ -94,5 +94,6 @@ int main() {
 
   fclose(f);
   free(arr);
+  free(pos);
   return 0;
 }

@@ -1,9 +1,11 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #define RULES 1176
 #define UPDATES 194
 
-typedef struct rule {
+typedef struct {
   int main;
   int sub;
 } rule;
@@ -19,26 +21,27 @@ void swap(int *a, int *b) {
 
 int main(void) {
   rule *rules = malloc(RULES * sizeof(rule));
-  FILE *fp = fopen("input.txt", "r");
+  FILE *f = fopen("input", "r");
+  assert(f && "input file missing");
   int ordered = 0, rest = 0;
   // rule parsing
   for (int i = 0; i < RULES; i++)
-    fscanf(fp, "%d|%d\n", &rules[i].main, &rules[i].sub);
+    fscanf(f, "%d|%d\n", &rules[i].main, &rules[i].sub);
   // update parsing
   for (int i = 0; i < UPDATES; i++) {
     int count = 0, offset = 0;
     char c;
-    while ((c = fgetc(fp)) != '\n') {
+    while ((c = fgetc(f)) != '\n') {
       if (c == ',')
         count++;
       offset++;
     }
     count++, offset++;
     int *updates = malloc(sizeof(int) * count);
-    fseek(fp, -offset, SEEK_CUR);
+    fseek(f, -offset, SEEK_CUR);
     for (int j = 0; j < count - 1; j++)
-      fscanf(fp, "%d,", &updates[j]);
-    fscanf(fp, "%d\n", &updates[count - 1]);
+      fscanf(f, "%d,", &updates[j]);
+    fscanf(f, "%d\n", &updates[count - 1]);
     int *kek = NULL, p = 0;
     // valid updates
     int flag = checkUpdate(rules, updates, count);
@@ -59,7 +62,7 @@ int main(void) {
     free(updates);
   }
   free(rules);
-  fclose(fp);
+  fclose(f);
   printf("ordered: %d\nrest: %d\n", ordered, rest);
   return 0;
 }

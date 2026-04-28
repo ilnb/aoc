@@ -2,20 +2,20 @@
 #include <stdlib.h>
 #define LEN 1000
 
-int safetyCheckPtr(int *arr, int n, int *index) {
+int safetyCheckPtr(int *arr, int n, int *idx) {
   for (int i = 0; i < n; i++)
     for (int j = 0; j < n; j++)
       if (!arr[i]) {
-        *index = i;
+        *idx = i;
         return 0;
       } else if (arr[i] > 0) {
         if (arr[j] < 0 || arr[j] > 3) {
-          *index = j;
+          *idx = j;
           return 0;
         }
       } else {
         if (arr[j] > 0 || arr[j] < -3) {
-          *index = j;
+          *idx = j;
           return 0;
         }
       }
@@ -37,67 +37,61 @@ int safetyCheck(int *arr, int n) {
   return 1;
 }
 
-void elRemove(int *arr, int n, int index) {
-  int *b = malloc(sizeof(int) * (n - 1));
-  for (int i = 0; i < index; i++)
-    b[i] = arr[i];
-  for (int i = index; i < n - 1; i++)
-    b[i] = arr[i + 1];
-  for (int i = 0; i < n - 1; i++)
-    arr[i] = b[i];
-  free(b);
+void elRemove(int *arr, int n, int idx) {
+  for (int i = idx; i < n - 1; i++)
+    arr[i] = arr[i + 1];
 }
 
 int main() {
-  FILE *fp = fopen("input.txt", "r");
+  FILE *fp = fopen("input", "r");
   int safe = 0, allowed = 0;
   for (int i = 0; i < LEN; i++) {
-    int count = 0, p = 0;
+    int n = 0, p = 0;
     char c;
     while ((c = fgetc(fp)) != '\n') {
       if (c == ' ')
-        count++;
+        n++;
       p++;
     }
-    count++, p++;
-    int *num = malloc(sizeof(int) * count);
+    n++, p++;
+    int *num = malloc(sizeof(int) * n);
     fseek(fp, -p, SEEK_CUR);
-    for (int j = 0; j < count - 1; j++)
+    for (int j = 0; j < n - 1; j++)
       fscanf(fp, "%d ", &num[j]);
-    fscanf(fp, "%d\n", &num[count - 1]);
-    int *temp = malloc(sizeof(int) * count);
-    for (int j = 0; j < count; j++)
+    fscanf(fp, "%d\n", &num[n - 1]);
+    int *temp = malloc(sizeof(int) * n);
+    for (int j = 0; j < n; j++)
       temp[j] = num[j];
-    int *diff = malloc(sizeof(int) * (count - 1));
-    for (int j = 0; j < count - 1; j++)
+    int *diff = malloc(sizeof(int) * (n - 1));
+    for (int j = 0; j < n - 1; j++)
       diff[j] = num[j + 1] - num[j];
-    int index, l;
-    l = safetyCheckPtr(diff, count - 1, &index);
+    int idx, l;
+    l = safetyCheckPtr(diff, n - 1, &idx);
     if (l)
       safe++;
     else {
-      elRemove(num, count, index);
-      for (int j = 0; j < count - 2; j++)
+      elRemove(num, n, idx);
+      for (int j = 0; j < n - 2; j++)
         diff[j] = num[j + 1] - num[j];
-      l = safetyCheck(diff, count - 2);
+      l = safetyCheck(diff, n - 2);
       if (l)
         allowed++;
       else {
-        for (int j = 0; j < count; j++)
+        for (int j = 0; j < n; j++)
           num[j] = temp[j];
-        elRemove(num, count, index + 1);
-        for (int j = 0; j < count - 2; j++)
+        elRemove(num, n, idx + 1);
+        for (int j = 0; j < n - 2; j++)
           diff[j] = num[j + 1] - num[j];
-        l = safetyCheck(diff, count - 2);
+        l = safetyCheck(diff, n - 2);
         if (l)
           allowed++;
-        else if (index > 0) {
-          for (int j = 0; j < count; j++)
+        else if (idx > 0) {
+          for (int j = 0; j < n; j++)
             num[j] = temp[j];
-          elRemove(num, count, index - 1);
-          for (int j = 0; j < count - 2; j++)
+          elRemove(num, n, idx - 1);
+          for (int j = 0; j < n - 2; j++)
             diff[j] = num[j + 1] - num[j];
-          l = safetyCheck(diff, count - 2);
+          l = safetyCheck(diff, n - 2);
           if (l)
             allowed++;
         }

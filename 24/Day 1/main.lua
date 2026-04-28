@@ -1,4 +1,4 @@
-local f = io.open('input.txt', 'r')
+local f = io.open('input', 'r')
 if not f then
   io.write('issues with input file.')
   return
