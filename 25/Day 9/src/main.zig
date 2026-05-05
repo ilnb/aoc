@@ -17,7 +17,7 @@ pub fn main(init: std.process.Init) !void {
     var file_r = file.reader(io, &file_buf);
     const reader = &file_r.interface;
 
-    var points = try std.ArrayList(Point).initCapacity(ga, 10);
+    var points: std.ArrayList(Point) = try .initCapacity(ga, 10);
     defer points.deinit(ga);
 
     while (try reader.takeDelimiter('\n')) |l| {

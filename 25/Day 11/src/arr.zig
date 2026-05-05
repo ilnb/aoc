@@ -93,7 +93,7 @@ fn surfIt(ga: std.mem.Allocator, graph: *AL(AL(u12)), bit: Bit) !u64 {
     defer topo.deinit(ga);
 
     const n = graph.items.len + 1;
-    var dp = try AL([4]u64).initCapacity(ga, n);
+    var dp: AL([4]u64) = try .initCapacity(ga, n);
     defer dp.deinit(ga);
 
     try dp.appendNTimes(ga, [4]u64{ 0, 0, 0, 0 }, n);
@@ -117,7 +117,7 @@ fn surfIt(ga: std.mem.Allocator, graph: *AL(AL(u12)), bit: Bit) !u64 {
 fn topoSort(ga: std.mem.Allocator, graph: *AL(AL(u12))) !AL(u12) {
     const n = graph.items.len + 1;
 
-    var indeg = try AL(u12).initCapacity(ga, n);
+    var indeg: AL(u12) = try .initCapacity(ga, n);
     defer indeg.deinit(ga);
     try indeg.appendNTimes(ga, 0, n);
 
@@ -131,7 +131,7 @@ fn topoSort(ga: std.mem.Allocator, graph: *AL(AL(u12))) !AL(u12) {
         if (d == 0) try q.push(@intCast(i));
     }
 
-    var ret = try AL(u12).initCapacity(ga, n); // free in surfIt
+    var ret: AL(u12) = try .initCapacity(ga, n); // free in surfIt
 
     while (q.pop()) |u| {
         try ret.append(ga, u);

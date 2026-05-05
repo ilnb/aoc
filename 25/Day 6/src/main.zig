@@ -17,13 +17,13 @@ pub fn main(init: std.process.Init) !void {
     var file_r = file.reader(io, &file_buf);
     const reader = &file_r.interface;
 
-    var lines = try std.ArrayList([]u8).initCapacity(ga, N);
+    var lines: std.ArrayList([]u8) = try .initCapacity(ga, N);
     defer {
         for (lines.items) |str| ga.free(str);
         lines.deinit(ga);
     }
 
-    var nums = try std.ArrayList(std.ArrayList(u64)).initCapacity(ga, N);
+    var nums: std.ArrayList(std.ArrayList(u64)) = try .initCapacity(ga, N);
     defer {
         for (nums.items) |*arr| arr.deinit(ga);
         nums.deinit(ga);
@@ -42,7 +42,7 @@ pub fn main(init: std.process.Init) !void {
         }
     }
 
-    var ops = try std.ArrayList(u8).initCapacity(ga, N);
+    var ops: std.ArrayList(u8) = try .initCapacity(ga, N);
     defer ops.deinit(ga);
 
     const l = (try reader.takeDelimiter('\n')).?;

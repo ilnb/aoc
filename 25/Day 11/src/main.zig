@@ -45,7 +45,7 @@ pub fn main(init: std.process.Init) !void {
         const pidx = node_map.get(p).?;
         if (graph.get(pidx) == null) {
             try graph.put(pidx, AL(u12).empty);
-            graph.getPtr(pidx).?.* = try AL(u12).initCapacity(ga, 10);
+            graph.getPtr(pidx).?.* = try .initCapacity(ga, 10);
         }
 
         while (itr.next()) |node| {
@@ -92,7 +92,7 @@ fn surfIt(ga: std.mem.Allocator, graph: *std.AutoHashMap(u12, AL(u12)), bit: Bit
     defer topo.deinit(ga);
 
     const n = graph.count() + 1;
-    var dp = try AL([4]u64).initCapacity(ga, n);
+    var dp: AL([4]u64) = try .initCapacity(ga, n);
     defer dp.deinit(ga);
 
     try dp.appendNTimes(ga, [4]u64{ 0, 0, 0, 0 }, n);
@@ -116,7 +116,7 @@ fn surfIt(ga: std.mem.Allocator, graph: *std.AutoHashMap(u12, AL(u12)), bit: Bit
 fn topoSort(ga: std.mem.Allocator, graph: *std.AutoHashMap(u12, AL(u12))) !AL(u12) {
     const n = graph.count() + 1;
 
-    var indeg = try AL(u12).initCapacity(ga, n);
+    var indeg: AL(u12) = try .initCapacity(ga, n);
     defer indeg.deinit(ga);
     try indeg.appendNTimes(ga, 0, n);
 
@@ -131,7 +131,7 @@ fn topoSort(ga: std.mem.Allocator, graph: *std.AutoHashMap(u12, AL(u12))) !AL(u1
         if (d == 0) try q.push(@intCast(i));
     }
 
-    var ret = try AL(u12).initCapacity(ga, n); // free in surfIt
+    var ret: AL(u12) = try .initCapacity(ga, n); // free in surfIt
 
     while (q.pop()) |u| {
         try ret.append(ga, u);

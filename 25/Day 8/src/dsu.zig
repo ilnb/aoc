@@ -8,9 +8,7 @@ pub fn DSU(comptime T: type) type {
         aa: std.mem.Allocator,
         ncomps: usize,
 
-        pub fn init(aa: std.mem.Allocator, n: T) !Self {
-            if (n <= 0) @panic("size for DSU.init should be positive.");
-
+        pub fn init(aa: std.mem.Allocator, n: usize) !Self {
             const parent = try aa.alloc(T, n);
             const size = try aa.alloc(T, n);
 
@@ -28,14 +26,14 @@ pub fn DSU(comptime T: type) type {
 
         pub fn find(self: *Self, x: T) T {
             var r = x;
-            while (self.parent[r] != r) {
-                self.parent[r] = self.parent[self.parent[r]];
-                r = self.parent[r];
+            while (self.parent[@intCast(r)] != r) {
+                self.parent[@intCast(r)] = self.parent[@intCast(self.parent[@intCast(r)])];
+                r = self.parent[@intCast(r)];
             }
             var t = x;
             while (t != r) {
-                const next = self.parent[t];
-                self.parent[t] = r;
+                const next = self.parent[@intCast(t)];
+                self.parent[@intCast(t)] = r;
                 t = next;
             }
             return r;
@@ -46,11 +44,11 @@ pub fn DSU(comptime T: type) type {
             var rb = self.find(b);
             if (ra == rb) return;
 
-            if (self.size[ra] < self.size[rb])
+            if (self.size[@intCast(ra)] < self.size[@intCast(rb)])
                 std.mem.swap(T, &ra, &rb);
 
-            self.parent[rb] = ra;
-            self.size[ra] += self.size[rb];
+            self.parent[@intCast(rb)] = ra;
+            self.size[@intCast(ra)] += self.size[@intCast(rb)];
             self.ncomps -= 1;
         }
 

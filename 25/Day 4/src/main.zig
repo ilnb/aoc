@@ -16,7 +16,7 @@ pub fn main(init: std.process.Init) !void {
     var file_r = file.reader(io, &file_buf);
     const reader = &file_r.interface;
 
-    var grid = try std.ArrayList([]u8).initCapacity(ga, N);
+    var grid: std.ArrayList([]u8) = try .initCapacity(ga, N);
     defer {
         for (grid.items) |l| ga.free(l);
         grid.deinit(ga);
