@@ -1,26 +1,19 @@
 const std = @import("std");
 const parseInt = std.fmt.parseInt;
 
-pub fn main() !void {
-    var gpa = std.heap.DebugAllocator(.{}){};
-    defer {
-        const status = gpa.deinit();
-        if (status == .leak) std.testing.expect(false) catch @panic("FAILURE");
-    }
-    const ga = gpa.allocator();
-
-    const args = try std.process.argsAlloc(ga);
-    defer std.process.argsFree(ga, args);
-
+pub fn main(init: std.process.Init) !void {
+    const io = init.io;
+    const ga = init.gpa;
+    const args = try init.minimal.args.toSlice(init.arena.allocator());
     if (args.len < 2) {
         std.debug.print("Provide the input file from cmdline\n", .{});
         return error.ExpectedArgument;
     }
 
-    const file = try std.fs.cwd().openFile(args[1], .{ .mode = .read_only });
-    defer file.close();
+    const file = try std.Io.Dir.cwd().openFile(io, args[1], .{ .mode = .read_only });
+    defer file.close(io);
     var file_buf: [128]u8 = undefined;
-    var file_r = file.reader(&file_buf);
+    var file_r = file.reader(io, &file_buf);
     const reader = &file_r.interface;
 
     var ranges = std.ArrayList([2]u64).empty;
@@ -61,7 +54,7 @@ pub fn main() !void {
     var p2: u64 = 0;
     for (ranges.items) |r| p2 += r[1] - r[0] + 1;
 
-    var std_w = std.fs.File.stdout().writer(&.{});
+    var std_w = std.Io.File.stdout().writer(io, &.{});
     var stdout = &std_w.interface;
 
     try stdout.print("p1: {d}\np2: {d}\n", .{ p1, p2 });

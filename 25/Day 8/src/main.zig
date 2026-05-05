@@ -4,26 +4,19 @@ const N = 1000;
 
 const Point = struct { x: u32, y: u32, z: u32 };
 
-pub fn main() !void {
-    var gpa = std.heap.DebugAllocator(.{}){};
-    defer {
-        const status = gpa.deinit();
-        if (status == .leak) std.testing.expect(false) catch @panic("FAILURE");
-    }
-    const ga = gpa.allocator();
-
-    const args = try std.process.argsAlloc(ga);
-    defer std.process.argsFree(ga, args);
-
+pub fn main(init: std.process.Init) !void {
+    const io = init.io;
+    const ga = init.gpa;
+    const args = try init.minimal.args.toSlice(init.arena.allocator());
     if (args.len < 2) {
         std.debug.print("Provide the input file from cmdline\n", .{});
         return error.ExpectedArgument;
     }
 
-    const file = try std.fs.cwd().openFile(args[1], .{ .mode = .read_only });
-    defer file.close();
+    const file = try std.Io.Dir.cwd().openFile(io, args[1], .{ .mode = .read_only });
+    defer file.close(io);
     var file_buf: [128]u8 = undefined;
-    var file_r = file.reader(&file_buf);
+    var file_r = file.reader(io, &file_buf);
     const reader = &file_r.interface;
 
     var lines: [N]Point = undefined;
@@ -44,19 +37,19 @@ pub fn main() !void {
         }
     };
 
-    var pq = std.PriorityQueue(Data, void, Data.lt).init(ga, {});
-    defer pq.deinit();
+    var pq = std.PriorityQueue(Data, void, Data.lt).empty;
+    defer pq.deinit(ga);
 
     for (0..N) |i| for (i + 1..N) |j| {
         const d = dist(lines[i], lines[j]);
-        try pq.add(.{ .d = d, .u = i, .v = j });
+        try pq.push(ga, .{ .d = d, .u = i, .v = j });
     };
 
     var dsu = try DSU(usize).init(ga, N);
     defer dsu.deinit();
 
     for (0..N) |_| {
-        const t = pq.remove();
+        const t = pq.pop().?;
         dsu.join(t.u, t.v);
     }
 
@@ -64,19 +57,19 @@ pub fn main() !void {
         fn lt(_: void, a: usize, b: usize) std.math.Order {
             return std.math.order(a, b);
         }
-    }.lt).init(ga, {});
-    defer size_pq.deinit();
+    }.lt).empty;
+    defer size_pq.deinit(ga);
 
     for (dsu.size) |x| {
-        try size_pq.add(x);
-        if (size_pq.items.len > 3) _ = size_pq.remove();
+        try size_pq.push(ga, x);
+        if (size_pq.items.len > 3) _ = size_pq.pop().?;
     }
 
     var p1: u64 = 1;
-    while (size_pq.removeOrNull()) |v| p1 *= v;
+    while (size_pq.pop()) |v| p1 *= v;
 
     var p2: u64 = 0;
-    while (pq.removeOrNull()) |t| {
+    while (pq.pop()) |t| {
         dsu.join(t.u, t.v);
         if (dsu.ncomps == 1) {
             const x1 = lines[t.u].x;
@@ -86,7 +79,7 @@ pub fn main() !void {
         }
     }
 
-    var std_w = std.fs.File.stdout().writer(&.{});
+    var std_w = std.Io.File.stdout().writer(io, &.{});
     var stdout = &std_w.interface;
 
     try stdout.print("p1: {d}\np2: {d}\n", .{ p1, p2 });
