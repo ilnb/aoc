@@ -100,13 +100,13 @@ def solve_machine_ilp(btn_masks, jolts, verbose=False):
 
     if status_str != "Optimal":
         if verbose:
-            print("=== ILP debug ===")
-            print("Status:", status_str)
-            print("A matrix:")
-            for row in A:
-                print(row)
-            print("b vector:", jolts)
-            print("n_buttons:", n_buttons, "n_switches:", n_switches)
+            # print("=== ILP debug ===")
+            # print("Status:", status_str)
+            # print("A matrix:")
+            # for row in A:
+                # print(row)
+            # print("b vector:", jolts)
+            # print("n_buttons:", n_buttons, "n_switches:", n_switches)
             # Print constraint feasibility in integer relaxation (quick check)
             try:
                 sol_relaxed = prob.solve(pulp.PULP_CBC_CMD(msg=0, timeLimit=5))
@@ -129,18 +129,20 @@ def main(inp_path: str):
             try:
                 cfg, btn_masks, jolts = parse_line(line)
             except Exception as e:
-                print(f"parse error line {lineno}: {e}", file=sys.stderr)
+                # print(f"parse error line {lineno}: {e}", file=sys.stderr)
                 continue
 
             # For debugging:
             # print("cfg:", cfg, "btns:", btn_masks, "jolts:", jolts)
 
             res = solve_machine_ilp(btn_masks, jolts)
-            if res is None:
-                print(f"Line {lineno}: infeasible ILP (no solution) for machine")
-            else:
-                print(f"Line {lineno}: min buttons = {res}")
+            if res is not None:
                 total_p2 += res
+            # if res is None:
+            #     # print(f"Line {lineno}: infeasible ILP (no solution) for machine")
+            # else:
+            #     # print(f"Line {lineno}: min buttons = {res}")
+            #     total_p2 += res
 
     print("TOTAL P2 =", total_p2)
 
