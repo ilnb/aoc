@@ -59,7 +59,7 @@ pub fn main(init: std.process.Init) !void {
 
     for (dsu.size) |x| {
         try size_pq.push(ga, x);
-        if (size_pq.items.len > 3) _ = size_pq.pop().?;
+        if (size_pq.items.len > 3) _ = size_pq.pop();
     }
 
     var p1: u64 = 1;

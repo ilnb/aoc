@@ -84,22 +84,16 @@ pub fn main(init: std.process.Init) !void {
 
         if (s >= N) break;
 
-        threads[i] = try std.Thread.spawn(.{}, worker, .{
-            machines.items,
-            s,
-            e,
-            &p1arr[i],
-            &p2arr[i],
-        });
+        threads[i] = try std.Thread.spawn(.{}, worker, .{ machines.items, s, e, &p1arr[i], &p2arr[i] });
     }
     for (threads) |t| t.join();
 
     var p1: u16 = 0;
     var p2: u16 = 0;
 
-    for (0..8) |i| {
-        p1 += p1arr[i];
-        p2 += p2arr[i];
+    for (p1arr, p2arr) |v1, v2| {
+        p1 += v1;
+        p2 += v2;
     }
 
     var std_w = std.Io.File.stdout().writer(io, &.{});
@@ -109,13 +103,7 @@ pub fn main(init: std.process.Init) !void {
     try stdout.flush();
 }
 
-fn worker(
-    machines: []Machine,
-    s: usize,
-    e: usize,
-    p1: *u16,
-    p2: *u16,
-) void {
+fn worker(machines: []Machine, s: usize, e: usize, p1: *u16, p2: *u16) void {
     var lp1: u16 = 0;
     var lp2: u16 = 0;
 
@@ -203,9 +191,6 @@ fn findMinCost(min_cost: *u16, idx: u16, curr: u16, final: u16, buttons: []u16, 
         }
         return;
     }
-
-    const n: u16 = @intCast(buttons.len);
-    if (idx == n) return;
 
     findMinCost(min_cost, idx + 1, curr, final, buttons, joltage, presses);
 
