@@ -44,11 +44,11 @@ pub fn main(init: std.process.Init) !void {
         const items = ranges.items;
         const idx = std.sort.lowerBound([2]u64, items, n, struct {
             fn lt(ctx: u64, r: [2]u64) std.math.Order {
-                return if (ctx < r[1]) .lt else if (ctx > r[1]) .gt else .eq;
+                return std.math.order(ctx, r[1]);
             }
         }.lt);
 
-        p1 += if (idx != items.len and items[idx][0] <= n) 1 else 0;
+        p1 += @intFromBool(idx != items.len and items[idx][0] <= n);
     }
 
     var p2: u64 = 0;
