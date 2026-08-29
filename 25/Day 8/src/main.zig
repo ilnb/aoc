@@ -42,7 +42,7 @@ pub fn main(init: std.process.Init) !void {
         try pq.push(ga, .{ d, i, j });
     };
 
-    var dsu = try DSU(usize).init(ga, N);
+    var dsu = try DSU.init(ga, N);
     defer dsu.deinit();
 
     for (0..N) |_| {
@@ -70,8 +70,8 @@ pub fn main(init: std.process.Init) !void {
         _, const u, const v = t;
         dsu.join(u, v);
         if (dsu.ncomps == 1) {
-            const x1 = lines[u].@"1";
-            const x2 = lines[v].@"1";
+            const x1 = lines[u].@"0";
+            const x2 = lines[v].@"0";
             p2 = x1 * x2;
             break;
         }
