@@ -30,7 +30,7 @@ pub fn main(init: std.process.Init) !void {
     }
 
     for (0..N) |i| {
-        try nums.append(ga, std.ArrayList(u64).empty);
+        try nums.append(ga, .empty);
 
         const l = (try reader.takeDelimiter('\n')).?;
         try lines.append(ga, try ga.dupe(u8, l));

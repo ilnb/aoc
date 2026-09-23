@@ -44,10 +44,9 @@ pub fn main(init: std.process.Init) !void {
     }
 
     var p2: u64 = 0;
+    var st = std.ArrayList(u8).empty;
+    defer st.deinit(ga);
     for (lines.items) |l| {
-        var st = std.ArrayList(u8).empty;
-        defer st.deinit(ga);
-
         var r = l.len - 12;
         const len = &st.items.len;
         for (l) |c| {
@@ -62,6 +61,7 @@ pub fn main(init: std.process.Init) !void {
         var val: u64 = 0;
         for (st.items[0..12]) |n| val = val * 10 + n;
         p2 += val;
+        st.clearRetainingCapacity();
     }
 
     var std_w = std.Io.File.stdout().writer(io, &.{});

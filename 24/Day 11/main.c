@@ -30,7 +30,7 @@ int main() {
       if (!strcmp(s, "0")) {
         hm_inc(nxt, "1", cnt);
       } else if (len & 1) {
-        uint64_t val = strtoull(s, NULL, 10);
+        uint64_t val = strtoull(s, nullptr, 10);
         val *= 2024;
         char buf[64];
         sprintf(buf, "%lu", val);
@@ -49,14 +49,14 @@ int main() {
     if (i == 25) {
       size_t p1 = 0;
       for (size_t i = 0; i < mp->cap; i++) {
-        if (mp->entries[i].key != NULL)
+        if (mp->entries[i].key != nullptr)
           p1 += mp->entries[i].val;
       }
       printf("p1: %lu\n", p1);
     } else if (i == 75) {
       size_t p2 = 0;
       for (size_t i = 0; i < mp->cap; i++) {
-        if (mp->entries[i].key != NULL)
+        if (mp->entries[i].key != nullptr)
           p2 += mp->entries[i].val;
       }
       printf("p2: %lu\n", p2);

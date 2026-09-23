@@ -57,14 +57,15 @@ fn validId2(s: []u8) bool {
     for (1..(n + 1) / 2) |l| {
         if (n % l != 0) continue;
         const pattern = s[0..l];
-        var r = true;
-        for (0..n) |i| {
-            if (s[i] != pattern[i % l]) {
-                r = false;
-                break;
+        if (lbl: {
+            for (0..n) |i| {
+                if (s[i] != pattern[i % l]) {
+                    break :lbl false;
+                }
             }
-        }
-        if (r) return false;
+            break :lbl true;
+        })
+            return false;
     }
     return true;
 }

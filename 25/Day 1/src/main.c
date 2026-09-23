@@ -13,7 +13,7 @@ int main() {
     if (val > 100)
       p2 += val / 100;
     val %= 100;
-    int flag = dial && (c == 'L' && val > dial) || (c == 'R' && val > 100 - dial);
+    int flag = dial && ((c == 'L' && val > dial) || (c == 'R' && val > 100 - dial));
     p2 += flag;
     if (c == 'L')
       dial = (dial - val + 100) % 100;

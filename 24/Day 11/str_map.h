@@ -14,8 +14,7 @@ typedef struct {
 
 typedef struct {
   entry *entries;
-  size_t cap;
-  size_t count;
+  size_t cap, count;
 } str_map;
 
 u64 hash_key(const char *key) {
@@ -28,7 +27,7 @@ u64 hash_key(const char *key) {
 }
 
 str_map *hm_create(size_t cap) {
-  str_map *mp = malloc(sizeof(str_map));
+  str_map *mp = malloc(sizeof *mp);
   mp->cap = cap;
   mp->count = 0;
   mp->entries = calloc(cap, sizeof(entry));
