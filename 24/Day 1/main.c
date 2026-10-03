@@ -15,13 +15,14 @@ void selsort(int *arr, int n) {
   }
 }
 
-int main(void) {
+int main() {
   FILE *f = fopen("input", "r");
   assert(f && "input file missing");
   int *num1 = malloc(sizeof(int) * LEN);
   int *num2 = malloc(sizeof(int) * LEN);
   for (int i = 0; i < LEN; i++)
     fscanf(f, "%d   %d\n", num1 + i, num2 + i);
+  fclose(f);
   selsort(num1, LEN);
   selsort(num2, LEN);
   int dis = 0;
@@ -40,6 +41,5 @@ int main(void) {
   printf("Distance: %d\nSimilarity score: %d\n", dis, sim);
   free(num1);
   free(num2);
-  fclose(f);
   return 0;
 }

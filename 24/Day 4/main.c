@@ -9,7 +9,7 @@ typedef struct {
   char *str;
 } data;
 
-int main(void) {
+int main() {
   int xmas = 0;
   FILE *f = fopen("input", "r");
   assert(f && "input file missing");
@@ -19,6 +19,7 @@ int main(void) {
     line[j].str = malloc(LEN + 1);
     fscanf(f, "%s\n", line[j].str);
   }
+  fclose(f);
   // horizontal
   for (int i = 0; i < LEN; i++)
     for (int j = 0; j < LEN; j++)
@@ -60,23 +61,18 @@ int main(void) {
   for (int i = 1; i < LEN - 1; i++)
     for (int j = 1; j < LEN - 1; j++)
       if (line[j].str[i] == 'A') {
-        if ((line[j + 1].str[i - 1] == 'M' && line[j - 1].str[i - 1] == 'M' &&
-             line[j + 1].str[i + 1] == 'S' && line[j - 1].str[i + 1] == 'S'))
+        if ((line[j + 1].str[i - 1] == 'M' && line[j - 1].str[i - 1] == 'M' && line[j + 1].str[i + 1] == 'S' && line[j - 1].str[i + 1] == 'S'))
           mas++;
-        else if ((line[j + 1].str[i - 1] == 'S' && line[j - 1].str[i - 1] == 'S' &&
-                  line[j + 1].str[i + 1] == 'M' && line[j - 1].str[i + 1] == 'M'))
+        else if ((line[j + 1].str[i - 1] == 'S' && line[j - 1].str[i - 1] == 'S' && line[j + 1].str[i + 1] == 'M' && line[j - 1].str[i + 1] == 'M'))
           mas++;
-        else if ((line[j + 1].str[i - 1] == 'M' && line[j + 1].str[i + 1] == 'M' &&
-                  line[j - 1].str[i - 1] == 'S' && line[j - 1].str[i + 1] == 'S'))
+        else if ((line[j + 1].str[i - 1] == 'M' && line[j + 1].str[i + 1] == 'M' && line[j - 1].str[i - 1] == 'S' && line[j - 1].str[i + 1] == 'S'))
           mas++;
-        else if ((line[j + 1].str[i - 1] == 'S' && line[j + 1].str[i + 1] == 'S' &&
-                  line[j - 1].str[i - 1] == 'M' && line[j - 1].str[i + 1] == 'M'))
+        else if ((line[j + 1].str[i - 1] == 'S' && line[j + 1].str[i + 1] == 'S' && line[j - 1].str[i - 1] == 'M' && line[j - 1].str[i + 1] == 'M'))
           mas++;
       }
   printf("xmas: %d\nmas: %d\n", xmas, mas);
   for (int i = 0; i < LEN; i++)
     free(line[i].str);
   free(line);
-  fclose(f);
   return 0;
 }

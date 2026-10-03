@@ -19,7 +19,7 @@ void swap(int *a, int *b) {
   *b = t;
 }
 
-int main(void) {
+int main() {
   rule *rules = malloc(RULES * sizeof(rule));
   FILE *f = fopen("input", "r");
   assert(f && "input file missing");

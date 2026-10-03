@@ -16,6 +16,7 @@ int main() {
     fscanf(f, "%s", buf);
     hm_set(mp, buf, 1);
   }
+  fclose(f);
   for (int i = 1; i <= 75; i++) {
     str_map *nxt = hm_create(mp->cap);
     for (size_t i = 0; i < mp->cap; i++) {
@@ -63,7 +64,6 @@ int main() {
     }
   }
   hm_free(mp);
-  fclose(f);
   return 0;
 }
 
